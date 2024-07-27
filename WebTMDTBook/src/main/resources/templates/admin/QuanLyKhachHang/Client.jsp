@@ -145,6 +145,7 @@ a {
 												<th>Giới Tính</th>
 												<!-- <th>Địa Chỉ</th> -->
 												<th>Vai trò</th>
+												<th>Trạng thái</th>
 												<th></th>
 												<th></th>
 											</tr>
@@ -161,6 +162,7 @@ a {
 													<td>${item.gender ? 'Nam' : 'Nữ'}</td>
 													<%-- <td>${item.address}</td> --%>
 													<td>${item.roleId.roleName}</td>
+													<td>${item.statusId.statusName}</td>
 													<td><a href="/admin/client/edit/${item.usersId}">Edit</a>
 													</td>
 													<td colspan="1"><a href="#" class="btn btn-danger"

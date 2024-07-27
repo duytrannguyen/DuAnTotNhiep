@@ -172,6 +172,17 @@ a {
 								</select>
 							</div>
 						</div>
+						<div class="mb-3 row">
+							<label for="statusId" class="col-sm-5 col-form-label">Trạng thái</label>
+							<div class="col-sm-7">
+								<select class="form-control" id="statusId" name="statusId">
+									<c:forEach var="userStatu" items="${userStatus}">
+										<option value="${userStatu.statusId}"
+											${itemProd.statusId.statusId == userStatu.statusId ? 'selected' : ''}>${userStatu.statusName}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
 					</div>
 				</div>
 				<!-- Control Buttons Section -->
