@@ -30,8 +30,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.poly.model.Image;
 import com.poly.model.Role;
 import com.poly.model.User;
+import com.poly.model.UserStatus;
 import com.poly.repository.RolesRepository;
 import com.poly.repository.UserRepository;
+import com.poly.repository.UserStatusRepository;
 import com.poly.service.UserService;
 
 import jakarta.servlet.ServletContext;
@@ -48,58 +50,57 @@ public class Admin_ClientController {
 	RolesRepository roleRepository;
 	@Autowired
 	ServletContext context;
+	@Autowired
+	UserStatusRepository userStatusRepository;
 
 	@GetMapping("/list")
-	public String filterUsers(HttpServletRequest req, 
-	                          @RequestParam(value = "gender", required = false) String gender,
-	                          @RequestParam(value = "keyword", required = false) String keyword,
-	                          @RequestParam(name = "pageNo", defaultValue = "0") int page,
-	                          @RequestParam(name = "size", defaultValue = "10") int size, 
-	                          Model model) {
+	public String filterUsers(HttpServletRequest req, @RequestParam(value = "gender", required = false) String gender,
+			@RequestParam(value = "keyword", required = false) String keyword,
+			@RequestParam(name = "pageNo", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "10") int size, Model model) {
 
-	    // Sắp xếp theo ID giảm dần
-	    Pageable pageable = PageRequest.of(page, size, Sort.by("usersId").descending());
+		// Sắp xếp theo ID giảm dần
+		Pageable pageable = PageRequest.of(page, size, Sort.by("usersId").descending());
 
-	    // Lấy trang dữ liệu người dùng từ userRepository dựa trên giới tính và roleId
-	    Page<User> usersPage;
-	    if (keyword != null && !keyword.isEmpty()) {
-	        if (gender == null || gender.isEmpty()) {
-	            usersPage = userRepository.searchUsersWithRoleId2(keyword, pageable);
-	        } else {
-	            Boolean genderBoolean = Boolean.valueOf(gender);
-	            usersPage = userRepository.searchByGenderAndRoleId(keyword, genderBoolean, pageable);
-	        }
-	    } else {
-	        if (gender == null || gender.isEmpty()) {
-	            usersPage = userRepository.findAllUsersWithRoleId2(pageable);
-	        } else {
-	            Boolean genderBoolean = Boolean.valueOf(gender);
-	            usersPage = userRepository.findByGenderAndRoleId(genderBoolean, pageable);
-	        }
-	    }
+		// Lấy trang dữ liệu người dùng từ userRepository dựa trên giới tính và roleId
+		Page<User> usersPage;
+		if (keyword != null && !keyword.isEmpty()) {
+			if (gender == null || gender.isEmpty()) {
+				usersPage = userRepository.searchUsersWithRoleId2(keyword, pageable);
+			} else {
+				Boolean genderBoolean = Boolean.valueOf(gender);
+				usersPage = userRepository.searchByGenderAndRoleId(keyword, genderBoolean, pageable);
+			}
+		} else {
+			if (gender == null || gender.isEmpty()) {
+				usersPage = userRepository.findAllUsersWithRoleId2(pageable);
+			} else {
+				Boolean genderBoolean = Boolean.valueOf(gender);
+				usersPage = userRepository.findByGenderAndRoleId(genderBoolean, pageable);
+			}
+		}
 
-	    // Danh sách người dùng của trang hiện tại
-	    List<User> users = usersPage.getContent();
+		// Danh sách người dùng của trang hiện tại
+		List<User> users = usersPage.getContent();
 
-	    // Tổng số trang
-	    int totalPages = usersPage.getTotalPages();
+		// Tổng số trang
+		int totalPages = usersPage.getTotalPages();
 
-	    // Danh sách các vai trò
-	    List<Role> roles = roleRepository.findAll();
-
-	    // Thêm các thông tin vào model
-	    model.addAttribute("Users", users);
-	    model.addAttribute("roles", roles);
-	    model.addAttribute("currentPage", page);
-	    model.addAttribute("totalPages", totalPages);
-	    model.addAttribute("selectedGender", gender);
-	    model.addAttribute("keyword", keyword);
-
-	    // Định tuyến tới view JSP
-	    req.setAttribute("view", "/views/admin/QuanLyKhachHang/Client.jsp");
-	    return "indexAdmin";
+		// Danh sách các vai trò
+		List<Role> roles = roleRepository.findAll();
+		List<UserStatus> userStatus = userStatusRepository.findAll();
+		// Thêm các thông tin vào model
+		model.addAttribute("Users", users);
+		model.addAttribute("roles", roles);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("selectedGender", gender);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("userStatus", userStatus);
+		// Định tuyến tới view JSP
+		req.setAttribute("view", "/views/admin/QuanLyKhachHang/Client.jsp");
+		return "indexAdmin";
 	}
-
 
 	@GetMapping("/edit/{usersId}")
 	public String edit(HttpServletRequest req, Model model, @PathVariable(name = "usersId") Integer id) {
@@ -114,85 +115,78 @@ public class Admin_ClientController {
 	}
 
 	@PostMapping("/update/{usersId}")
-	public String update(HttpServletRequest req,
-	                     @PathVariable("usersId") Integer usersId,
-	                     @RequestParam("username") String username,
-	                     @RequestParam("fullName") String fullName,
-	                     @RequestParam("phone") String phone,
-	                     @RequestParam("birthDate") String birthDateStr,
-	                     @RequestParam("gender") Boolean gender,
-	                     @RequestParam("email") String email,
+	public String update(HttpServletRequest req, @PathVariable("usersId") Integer usersId,
+			@RequestParam("username") String username, @RequestParam("fullName") String fullName,
+			@RequestParam("phone") String phone, @RequestParam("birthDate") String birthDateStr,
+			@RequestParam("gender") Boolean gender, @RequestParam("email") String email,
 //	                     @RequestParam("address") String address,
-	                     @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-	                     @RequestParam("roleId") int roleId,
-	                     Model model) {
+			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+			@RequestParam("roleId") int roleId, Model model) {
 
-	    User user = userRepository.findById(usersId)
-	            .orElseThrow(() -> new RuntimeException("User not found"));
-	    Date birthDate = null;
-	    try {
-	        birthDate = new SimpleDateFormat("yyyy-MM-dd").parse(birthDateStr);
-	    } catch (ParseException e) {
-	        e.printStackTrace();
-	        req.setAttribute("error", "Invalid date format");
-	        return "errorPage";
-	    }
-	    user.setUsername(username);  // Ensure the username is also set
-	    user.setFullName(fullName);
-	    user.setPhone(phone);
-	    user.setBirthDate(birthDate);
-	    user.setGender(gender);
-	    user.setEmail(email);
+		User user = userRepository.findById(usersId).orElseThrow(() -> new RuntimeException("User not found"));
+		Date birthDate = null;
+		try {
+			birthDate = new SimpleDateFormat("yyyy-MM-dd").parse(birthDateStr);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			req.setAttribute("error", "Invalid date format");
+			return "errorPage";
+		}
+		user.setUsername(username); // Ensure the username is also set
+		user.setFullName(fullName);
+		user.setPhone(phone);
+		user.setBirthDate(birthDate);
+		user.setGender(gender);
+		user.setEmail(email);
 //	    user.setAddress(address);
 
-	    // Handle profile image upload if provided
-	    if (profileImage != null && !profileImage.isEmpty()) {
-	        try {
-	            // Check file type
-	            if (!profileImage.getContentType().startsWith("image")) {
-	                req.setAttribute("error", "Only image files are allowed");
-	                return "errorPage";
-	            }
+		// Handle profile image upload if provided
+		if (profileImage != null && !profileImage.isEmpty()) {
+			try {
+				// Check file type
+				if (!profileImage.getContentType().startsWith("image")) {
+					req.setAttribute("error", "Only image files are allowed");
+					return "errorPage";
+				}
 
-	            // Define upload directory
-	            String uploadDir = "/Image_Users/";
-	            String realPath = req.getServletContext().getRealPath(uploadDir);
-	            Path path = Paths.get(realPath);
-	            if (Files.notExists(path)) {
-	                Files.createDirectories(path);
-	            }
+				// Define upload directory
+				String uploadDir = "/Image_Users/";
+				String realPath = req.getServletContext().getRealPath(uploadDir);
+				Path path = Paths.get(realPath);
+				if (Files.notExists(path)) {
+					Files.createDirectories(path);
+				}
 
-	            // Save image file to upload directory
-	            String fileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
-	            Path filePath = Paths.get(realPath, fileName);
-	            Files.copy(profileImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+				// Save image file to upload directory
+				String fileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
+				Path filePath = Paths.get(realPath, fileName);
+				Files.copy(profileImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-	            // Set the filename in the user object
-	            user.setProfileImage(fileName);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	            req.setAttribute("error", "Failed to upload image");
-	            return "errorPage";
-	        }
-	    }
+				// Set the filename in the user object
+				user.setProfileImage(fileName);
+			} catch (IOException e) {
+				e.printStackTrace();
+				req.setAttribute("error", "Failed to upload image");
+				return "errorPage";
+			}
+		}
 
-	    // Handle role update
-	    Role role = roleRepository.findById(roleId)
-	            .orElseThrow(() -> new RuntimeException("Role not found"));
-	    user.setRoleId(role);
+		// Handle role update
+		Role role = roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found"));
+		user.setRoleId(role);
 
-	    // Save updated user
-	    userRepository.save(user);
+		// Save updated user
+		userRepository.save(user);
 
-	    // Add success message
-	    model.addAttribute("successMessage", "Cập nhật người dùng thành công!");
+		// Add success message
+		model.addAttribute("successMessage", "Cập nhật người dùng thành công!");
 
-	    return "redirect:/admin/client/list";
+		return "redirect:/admin/client/list";
 	}
 
-	
 	@GetMapping("/delete/{userId}")
-	public String deleteUser(@PathVariable(name = "userId") Integer userId, Model model,RedirectAttributes redirectAttributes) {
+	public String deleteUser(@PathVariable(name = "userId") Integer userId, Model model,
+			RedirectAttributes redirectAttributes) {
 		// Fetch the user by id
 		try {
 			User user = userRepository.findById(userId).orElse(null);
@@ -212,7 +206,6 @@ public class Admin_ClientController {
 			redirectAttributes.addFlashAttribute("toastMessage", "Đã xảy ra lỗi trong quá trình xóa người dùng!.");
 
 		}
-		
 
 		return "redirect:/admin/client/list"; // Redirect to the list page after deletion
 	}
