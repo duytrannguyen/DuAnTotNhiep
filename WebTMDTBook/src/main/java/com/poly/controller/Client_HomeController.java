@@ -2,6 +2,7 @@ package com.poly.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,13 +59,42 @@ public class Client_HomeController {
 	@Autowired
 	CategoryService categoryService;
 
+//	@GetMapping("/index")
+//	public String home(Model model) {
+//		List<Product> products = productService.getAllProducts();
+//		model.addAttribute("products", products);
+//		List<Category> categories = categoryService.getAllCategory();
+//		model.addAttribute("categories", categories);
+//		return "indexClient";
+//	}
 	@GetMapping("/index")
 	public String home(Model model) {
-		List<Product> products = productService.getAllProducts();
-		model.addAttribute("products", products);
-		List<Category> categories = categoryService.getAllCategory();
-		model.addAttribute("categories", categories);
-		return "indexClient";
+	    List<Product> products = productService.getAllProducts(); // Lấy tất cả sản phẩm
+	    model.addAttribute("products", products); // Thêm danh sách sản phẩm vào mô hình
+	    
+	    // Tạo danh sách để phân loại sản phẩm hiện tại và sản phẩm sắp bán
+	    List<Product> currentProducts = new ArrayList<>(); // Danh sách sản phẩm hiện tại
+	    List<Product> upcomingProducts = new ArrayList<>(); // Danh sách sản phẩm sắp bán
+	    Date currentDate = new Date(); // Lấy ngày hiện tại
+
+	    // Duyệt qua từng sản phẩm để phân loại
+	    for (Product product : products) {
+	        // Kiểm tra nếu ngày đăng nhỏ hơn ngày hiện tại
+	        if (product.getPostingDate().before(currentDate)) {
+	            currentProducts.add(product); // Sản phẩm có sẵn
+	        } else {
+	            upcomingProducts.add(product); // Sản phẩm sắp bán
+	        }
+	    }
+
+	    // Thêm cả hai danh sách vào mô hình để có thể sử dụng trong view
+	    model.addAttribute("currentProducts", currentProducts);
+	    model.addAttribute("upcomingProducts", upcomingProducts);
+
+	    List<Category> categories = categoryService.getAllCategory(); // Lấy tất cả danh mục
+	    model.addAttribute("categories", categories); // Thêm danh sách danh mục vào mô hình
+	    
+	    return "indexClient"; // Trả về view indexClient
 	}
 
 	@GetMapping("/filter/{categoryId}")

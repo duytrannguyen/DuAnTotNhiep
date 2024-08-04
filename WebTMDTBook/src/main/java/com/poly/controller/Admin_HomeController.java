@@ -46,7 +46,7 @@ public class Admin_HomeController {
 		model.addAttribute("totalProducts", totalProducts);
 		model.addAttribute("totalAmount", totalAmount);
 		model.addAttribute("totalOrders", totalOrders);
-		req.setAttribute("view", "/views/admin/BaoCaoThongKe/Report.jsp");
+		req.setAttribute("view", "/admin/BaoCaoThongKe/Report.jsp");
 		return "indexAdmin";
 
 	}
