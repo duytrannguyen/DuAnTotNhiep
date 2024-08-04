@@ -41,8 +41,8 @@ public class Invoice {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date paymentDate;
 
-	@Column(nullable = false)
-	private String paymentStatus;
+//	@Column(nullable = false)
+//	private String paymentStatus;
 
 	@ManyToOne
 	@JoinColumn(name = "users_id", nullable = false)

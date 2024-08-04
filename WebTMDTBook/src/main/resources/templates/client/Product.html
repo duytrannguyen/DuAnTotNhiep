@@ -25,10 +25,15 @@
 	integrity="sha512-naukR7I+Nk6gp7p5TMA4ycgfxaZBJ7MO5iC3Fp6ySQyKFHOGfpkSZkYVWV5R7u7cfAicxanwYQ5D1e17EfJcMA=="
 	crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/client/products.css">
+<!-- Additional CSS Files -->
+<link rel="stylesheet" href="/assets/css/fontawesome.css">
+<link rel="stylesheet" href="/assets/css/templatemo-liberty-market.css">
+<link rel="stylesheet" href="/assets/css/owl.css">
+<link rel="stylesheet" href="/assets/css/animate.css">
 <link rel="stylesheet"
-	href="/css/style.css">
-<link rel="stylesheet"
-	href="/css/client/products.css">
+	href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
 <style type="text/css">
 body, html {
 	margin: 0;
@@ -37,10 +42,10 @@ body, html {
 	width: 100%;
 }
 
-.page-heading {
-	padding: 20px 0;
-	background: #f5f5f5;
-}
+/* .page-heading { */
+/* 	padding: 20px 0; */
+/* 	background: #f5f5f5; */
+/* } */
 
 .container-fluid {
 	padding: 20px;
@@ -89,7 +94,8 @@ body, html {
 .lb {
 	padding: 5px;
 }
-  .giamGia {
+
+.giamGia {
 	text-decoration: line-through;
 }
 </style>
@@ -98,16 +104,11 @@ body, html {
 
 <body>
 	<div th:replace="client_layout/header :: header"></div>
-<!--   	<header th:insert="client_layout/header :: header"></header> -->
 	<div class="page-heading normal-space">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-12">
-<!-- <<<<<<< duy -->
-					<h1 style="color: white;">Sản phẩm</h1>
-<!-- >>>>>>> di --> -->
-<!-- 					<h1 style="text-align: center;">Sản phẩm</h1> -->
-
+				<div class="col-lg-12" >
+					<h1 style="text-align: center; font-size: xx-large;">Sản phẩm</h1>
 				</div>
 			</div>
 		</div>
@@ -121,10 +122,10 @@ body, html {
 						<!-- GIÁ -->
 						<br>
 						<ul>
-<!-- <<<<<<< duy -->
-							<a><strong>GIÁ</strong></a>
-<!-- >>>>>>> di -->
-<!-- 							<strong>GIÁ</strong> -->
+							<!-- <<<<<<< duy -->
+<!-- 							<a><strong>GIÁ</strong></a> -->
+							<!-- >>>>>>> di -->
+														<strong>GIÁ</strong>
 
 							<form action="/home/products" method="post"
 								id="product-filter-form" onchange="this.submit()">
@@ -171,7 +172,7 @@ body, html {
 						<hr>
 						<!-- THỂ LOẠI -->
 						<ul class="ul">
-<!-- <<<<<<< duy -->
+							<!-- <<<<<<< duy -->
 							<ul>
 								<a><strong>THỂ LOẠI</strong></a>
 								<form id="filter-form">
@@ -198,8 +199,8 @@ body, html {
 									</div>
 								</form>
 							</ul>
-<!-- ======= di -->
-<!-- 							<strong>THỂ LOẠI</strong>
+							<!-- ======= di -->
+							<!-- 							<strong>THỂ LOẠI</strong>
 							<form id="filter-form" action="/home/products" method="get">
 								<div class="form-group">
 									<div class="form-check">
@@ -231,21 +232,23 @@ body, html {
 					<div class="card" style="padding: 20px">
 						<div class="row">
 							<div class="col-md-5">
+<!-- 							tìm kiếm giọng nói -->
 								<label class="lb"><em><b>Tìm kiếm sản phẩm</b></em></label>
-								<form class="d-flex" role="search" action="/home/products"
-									method="get">
-									<input class="form-control me-2" type="search"
-										aria-label="Search" name="keyName">
-									<button class="btn btn-outline-primary" type="submit"
-										id="liveToastBtn">
-										<i class="fa-solid fa-magnifying-glass"></i>
-									</button>
-								</form>
+             <form class="d-flex" role="search" action="/home/products" method="get" id="searchForm">
+                <input class="form-control me-2" type="search" aria-label="Search" name="keyName" id="searchInput">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                 <button class="btn btn-outline-secondary ms-2" type="button" id="voiceButton">
+                    <i class="fa-solid fa-microphone microphone-icon" id="microphoneIcon"></i>
+                    <div class="recording-indicator" id="recordingIndicator"></div>
+                </button>
+            </form>
 							</div>
 						</div>
 						<hr>
 						<!-- DANH SÁCH SẢN PHẨM -->
-<!-- <<<<<<< duy -->
+						<!-- <<<<<<< duy -->
 						<div class="row row-cols-1 g-4">
 							<h6>DANH SÁCH SẢN PHẨM</h6>
 							<div th:each="p : ${currentProducts}" class="col-md-3">
@@ -268,38 +271,37 @@ body, html {
 							<hr>
 							<br>
 							<!-- CHUYỂN TRANG -->
-							<div class="card-footer d-flex justify-content-center">
-								<nav aria-label="Page navigation example">
-									<ul class="pagination mb-0">
-										<li class="page-item"><a
-											class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg"
-											th:href="@{'?pageNo=' + (${pageClick} > 0 ? ${pageClick} - 1 : 0)}"
-											aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
-										</a></li>
-										<li th:each="pageNum : ${totalPageProduct}" class="page-item">
-											<a
-											class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg"
-											th:classappend="${pageClick} == ${pageNum - 1} ? 'selected' : ''"
-											th:href="@{'?pageNo=' + (${pageNum - 1})}">[[${pageNum}]]</a>
-										</li>
-										<li class="page-item"><a
-											class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg"
-											th:href="@{'?pageNo=' + (${pageClick} < ${totalPageProduct.size()} - 1 ? ${pageClick} + 1 : ${totalPageProduct.size()} - 1)}"
-											aria-label="Next"> <span aria-hidden="true">&raquo;</span>
-										</a></li>
-									</ul>
-								</nav>
-							</div>
+<!-- 							<div class="card-footer d-flex justify-content-center"> -->
+<!-- 								<nav aria-label="Page navigation example"> -->
+<!-- 									<ul class="pagination mb-0"> -->
+<!-- 										<li class="page-item"><a -->
+<!-- 											class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg" -->
+<!-- 											th:href="@{'?pageNo=' + (${pageClick} > 0 ? ${pageClick} - 1 : 0)}" -->
+<!-- 											aria-label="Previous"> <span aria-hidden="true">&laquo;</span> -->
+<!-- 										</a></li> -->
+<!-- 										<li th:each="pageNum : ${totalPageProduct}" class="page-item"> -->
+<!-- 											<a -->
+<!-- 											class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg" -->
+<!-- 											th:classappend="${pageClick} == ${pageNum - 1} ? 'selected' : ''" -->
+<!-- 											th:href="@{'?pageNo=' + (${pageNum - 1})}">[[${pageNum}]]</a> -->
+<!-- 										</li> -->
+<!-- 										<li class="page-item"><a -->
+<!-- 											class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg" -->
+<!-- 											th:href="@{'?pageNo=' + (${pageClick} < ${totalPageProduct.size()} - 1 ? ${pageClick} + 1 : ${totalPageProduct.size()} - 1)}" -->
+<!-- 											aria-label="Next"> <span aria-hidden="true">&raquo;</span> -->
+<!-- 										</a></li> -->
+<!-- 									</ul> -->
+<!-- 								</nav> -->
+<!-- 							</div> -->
 						</div>
-<!-- ======= di -->
-<!-- 						<h6>DANH SÁCH SẢN PHẨM</h6>
+<!-- 						======= di -->
+												<h6>DANH SÁCH SẢN PHẨM</h6>
 						<div class="row row-cols-1 row-cols-md-4 g-4">
 							<div th:each="p : ${products}">
 								<div class="col">
 									<a th:href="@{/home/products/details/{id}(id=${p.productId})}"
 										class="a-product text-decoration-none">
 										<div class="card h-100 border-0 shadow-sm hover-shadow-lg">
-
 											<img
 												th:src="@{/Image_SP/{imageName}(imageName=${p.imageId.imageName})}"
 												class="card-img-top"
@@ -318,19 +320,15 @@ body, html {
 														th:text="${p.discountPercentage}"></b>%
 													</a>
 												</p>
-
-
 											</div>
 										</div>
 									</a>
 								</div>
-
 							</div>
 						</div>
-
-						<br> -->
+						<br>
 						<!-- PHÂN TRANG -->
-<!-- 						<div class="card-footer d-flex justify-content-center">
+											<div class="card-footer d-flex justify-content-center">
 							<nav aria-label="Page navigation example">
 								<ul class="pagination mb-0">
 									<li class="page-item"><a
@@ -348,7 +346,7 @@ body, html {
 
 								</ul>
 							</nav>
-						</div> -->
+						</div> 
 					</div>
 				</div>
 			</div>
@@ -425,5 +423,71 @@ body, html {
             window.location.href = "/home/products";
         }
     </script>
+	<!-- Bootstrap core JavaScript -->
+	<script src="/vendor/jquery/jquery.min.js"></script>
+	<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<script src="/assets/js/isotope.min.js"></script>
+	<script src="/assets/js/owl-carousel.js"></script>
+	<script src="/assets/js/tabs.js"></script>
+	<script src="/assets/js/popup.js"></script>
+	<script src="/assets/js/custom.js"></script>
+	
+	<script type="text/javascript">
+	//search voice
+    // Check if browser supports Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'vi-VN';
+        recognition.interimResults = true; // Enable interim results
+        recognition.maxAlternatives = 1;
+        
+        let isRecognitionEnded = false;
+        const searchInput = document.getElementById('searchInput');
+        const voiceButton = document.getElementById('voiceButton');
+        const searchForm = document.getElementById('searchForm');
+
+        voiceButton.addEventListener('click', () => {
+            recognition.start();
+            isRecognitionEnded = false; // Reset flag when starting recognition
+        });
+
+        recognition.onresult = (event) => {
+            let finalTranscript = '';
+            let interimTranscript = '';
+            
+            for (const result of event.results) {
+                if (result.isFinal) {
+                    finalTranscript += result[0].transcript;
+                } else {
+                    interimTranscript += result[0].transcript;
+                }
+            }
+            
+            // Update the search input with the final or interim result
+            searchInput.value = finalTranscript + interimTranscript;
+        };
+
+        recognition.onend = () => {
+            // Only submit the form if recognition has truly ended and is not restarting
+            if (!isRecognitionEnded) {
+                isRecognitionEnded = true;
+                searchForm.submit();
+            }
+        };
+
+        // Xử lý lỗi trong quá trình nhận diện giọng nói
+        recognition.onerror = (event) => {
+            alert('Lỗi nhận diện giọng nói: ' + event.error); // Hiển thị lỗi bằng alert
+            microphoneIcon.classList.remove('active'); // Khôi phục màu icon khi có lỗi
+            recordingIndicator.style.display = 'none'; // Ẩn chỉ báo ghi âm khi có lỗi
+        };
+    } else {
+        console.log('Không hỗ trợ.');
+        document.getElementById('voiceButton').style.display = 'none';
+    }
+	
+	</script>
 </body>
 </html>

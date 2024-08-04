@@ -14,10 +14,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 	@Autowired
 	private InvoiceRepository invoiceRepository;
 
-	@Override
-	public List<Invoice> getAllInvoices() {
-		return invoiceRepository.findAllInvoicesWithDetails();
-	}
+//	@Override
+//	public List<Invoice> getAllInvoices() {
+//		return invoiceRepository.findAllInvoicesWithDetails();
+//	}
 
 	@Override
 	public Double getTotalAmount() {
@@ -29,16 +29,16 @@ public class InvoiceServiceImpl implements InvoiceService {
 		return invoiceRepository.countTotalOrders();
 	}
 
-	@Override
-	public List<Invoice> searchInvoices(String searchQuery) {
-		Integer invoiceId = null;
-		try {
-			invoiceId = Integer.parseInt(searchQuery);
-		} catch (NumberFormatException e) {
-			// Do nothing, invoiceId will be null
-		}
-		return invoiceRepository.findByInvoiceIdOrCartUserFullNameContaining(invoiceId, searchQuery);
-	}
+//	@Override
+//	public List<Invoice> searchInvoices(String searchQuery) {
+//		Integer invoiceId = null;
+//		try {
+//			invoiceId = Integer.parseInt(searchQuery);
+//		} catch (NumberFormatException e) {
+//			// Do nothing, invoiceId will be null
+//		}
+//		return invoiceRepository.findByInvoiceIdOrCartUserFullNameContaining(invoiceId, searchQuery);
+//	}
 
 	//Khang
 	@Override
@@ -56,5 +56,20 @@ public class InvoiceServiceImpl implements InvoiceService {
 	@Override
 	public void save(Invoice invoice) {
 		invoiceRepository.save(invoice);
+	}
+	
+	
+	
+//ly
+	@Override
+	public List<Invoice> searchInvoices(String searchQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Invoice> getAllInvoices() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

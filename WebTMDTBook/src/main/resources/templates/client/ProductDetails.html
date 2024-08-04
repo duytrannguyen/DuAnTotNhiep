@@ -29,7 +29,13 @@
 	integrity="sha512-naukR7I+Nk6gp7p5TMA4ycgfxaZBJ7MO5iC3Fp6ySQyKFHOGfpkSZkYVWV5R7u7cfAicxanwYQ5D1e17EfJcMA=="
 	crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-
+<!-- Additional CSS Files -->
+<link rel="stylesheet" href="/assets/css/fontawesome.css">
+<link rel="stylesheet" href="/assets/css/templatemo-liberty-market.css">
+<link rel="stylesheet" href="/assets/css/owl.css">
+<link rel="stylesheet" href="/assets/css/animate.css">
+<link rel="stylesheet"
+	href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
 <!-- 	css -->
 <style type="text/css">
 .card {
@@ -148,9 +154,8 @@ img {
 								<i class="fa-solid fa-cart-plus"></i> Thêm Vào Giỏ Hàng
 							</button>
 						</a> <a
-							th:href="@{/products/details/cart/pay(productId=${productId})}"
+							th:href="@{/products/details/cart/paynow(productId=${productId})}"
 							class="btn btn-primary btnn">Mua Ngay</a>
-
 					</div>
 				</div>
 			</div>
@@ -331,5 +336,14 @@ img {
 		document.getElementById("value").textContent = value;
 	}
 	</script>
+	<!-- Bootstrap core JavaScript -->
+	<script src="/vendor/jquery/jquery.min.js"></script>
+	<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<script src="/assets/js/isotope.min.js"></script>
+	<script src="/assets/js/owl-carousel.js"></script>
+	<script src="/assets/js/tabs.js"></script>
+	<script src="/assets/js/popup.js"></script>
+	<script src="/assets/js/custom.js"></script>
 </body>
 </html>
