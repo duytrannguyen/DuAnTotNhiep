@@ -2,12 +2,15 @@ package com.poly.controller;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
@@ -15,11 +18,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.poly.model.Address;
 import com.poly.model.CartItem;
+import com.poly.model.Discount;
 import com.poly.model.Invoice;
 import com.poly.model.InvoiceItem;
 import com.poly.model.OrderStatus;
@@ -34,6 +40,8 @@ import com.poly.repository.InvoiceRepository;
 import com.poly.repository.ProductRepository;
 import com.poly.repository.ShoppingCartRepository;
 import com.poly.repository.UserRepository;
+import com.poly.service.CartService;
+import com.poly.service.DiscountService;
 import com.poly.service.SessionService;
 
 import jakarta.mail.internet.MimeMessage;
@@ -41,13 +49,6 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.RequestMethod;
 
-
-
-//controller:  clientPayment
-//model: invoiceItem,
-//repository: 
-//view: 
-//js
 
 @Controller
 public class Client_PayController {
@@ -67,6 +68,11 @@ public class Client_PayController {
 	SessionService sessionService;
 	@Autowired
 	JavaMailSender sender;
+	
+	@Autowired
+    CartService cartService; // Dịch vụ giỏ hàng
+	@Autowired
+    DiscountService discountService;
 	
 	@RequestMapping("/products/details/cart/pay")
 	public String pay(@RequestParam("cartItemIds") String cartItemIds, Model model) {
@@ -136,6 +142,7 @@ public class Client_PayController {
 	    if (user == null) {
 	        return "redirect:/home/login"; // Chuyển hướng đến trang đăng nhập nếu người dùng chưa đăng nhập
 	    }
+
 	    // Tìm giỏ hàng hiện tại của người dùng
 	    ShoppingCart shoppingCart = shoppingCartRepository.findByUser(user);
 	    if (shoppingCart == null) {
@@ -144,87 +151,109 @@ public class Client_PayController {
 	        shoppingCart.setUser(user);
 	        shoppingCartRepository.save(shoppingCart);
 	    }
+
 	    // Tìm sản phẩm dựa trên productId
 	    Product product = productRepository.findById(productId).orElse(null);
 	    if (product == null) {
 	        // Xử lý trường hợp không tìm thấy sản phẩm
 	        return "error"; // Có thể chuyển hướng đến trang lỗi
 	    }
+
 	    // Tạo một CartItem mới cho sản phẩm
 	    CartItem cartItem = new CartItem();
 	    cartItem.setShoppingCart(shoppingCart);
 	    cartItem.setProductId(product);
 	    cartItem.setQuantity(1); // Thiết lập số lượng mặc định (có thể điều chỉnh tùy theo yêu cầu)
 	    cartItemRepository.save(cartItem);
+
 	    // Lấy lại danh sách CartItem từ shoppingCart
 	    List<CartItem> cartItems = cartItemRepository.findByShoppingCart(shoppingCart);
+
 	    // Tính toán tổng tiền
 	    double total = 0;
 	    for (CartItem item : cartItems) {
 	        total += item.getProductId().getPrice() * item.getQuantity();
 	    }
+
 	    // Lưu cartId và cartItems vào session
 	    session.setAttribute("cartId", shoppingCart.getCartId());
 	    session.setAttribute("cartItems", cartItems);
+
 	    // Thêm các thuộc tính cần thiết vào model cho trang thanh toán
 	    model.addAttribute("user", user);
 	    model.addAttribute("cartItems", cartItems);
 	    model.addAttribute("total", total);
-	    // Lấy địa chỉ mặc định của người dùng (nếu cần)
+
 	    Address defaultAddress = user.getAddresses().stream()
-	                                    .filter(Address::isStatus) // Giả sử isStatus() trả về kiểu boolean
-	                                    .findFirst()
-	                                    .orElse(null);
-	    model.addAttribute("address", defaultAddress);
+                .filter(Address::isStatus)
+                .findFirst()
+                .orElse(null);
+if (defaultAddress != null) {
+System.out.println("Default Address: " + defaultAddress);
+} else {
+System.out.println("Default Address is null");
+}
+model.addAttribute("address", defaultAddress);
+
+
+
+	    // Tạo đối tượng invoice và thêm vào model
+	    Invoice invoice = new Invoice();
+	    model.addAttribute("invoice", invoice);
+
 	    // Chuyển hướng đến trang thanh toán
 	    return "client/Pay";
 	}
 
+
 	@PostMapping("/products/details/cart/pay")
-	public String pay(@ModelAttribute("invoice") Invoice invoice, Model model,
-	                  @RequestParam("cart_id") ShoppingCart cart_id,
+	public String pay(@ModelAttribute("invoice") Invoice invoice, 
 	                  @RequestParam("status_id") int status_id,
 	                  @RequestParam("payment_method_id") int payment_method_id,
 	                  @RequestParam("payment_status") String payment_status,
 	                  @RequestParam("shipping_id") int shipping_id,
 	                  @RequestParam("totalAmount") double totalAmount,
-	                  HttpSession session) {
-	    //int userId = 7; // Thay đổi ID người dùng tùy theo logic của bạn
-	    // Hiển thị thông tin người dùng
-	   // User user = userRepository.findById(userId).orElse(null);
-		User user = (User) session.getAttribute("user");
+	                  HttpSession session,
+	                  Model model) {
+	    // Lấy thông tin người dùng từ session
+	    User user = (User) session.getAttribute("user");
 	    if (user == null) {
 	        return "redirect:/error"; // Chuyển hướng đến trang lỗi nếu không tìm thấy người dùng
 	    }
-	    // Cập nhật thông tin invoice
+	    
+	    // Tạo và thiết lập các đối tượng liên quan
 	    Shipping shipping = new Shipping();
-	    shipping.setShipping_id(shipping_id);
+	    shipping.setShipping_id(shipping_id); // Đảm bảo rằng shipping_id là giá trị hợp lệ
+
 	    OrderStatus orderStatus = new OrderStatus();
 	    orderStatus.setStatusId(status_id);
 	    PaymentMethod paymentMethod = new PaymentMethod();
 	    paymentMethod.setPaymentMethodId(payment_method_id); // Sử dụng id từ radio button
+	    
+	    // Cập nhật thông tin hóa đơn
 	    invoice.setStatus(orderStatus);
 	    invoice.setPaymentMethod(paymentMethod);
 	    invoice.setShipping(shipping);
 	    invoice.setPaymentDate(new Date());
 	    invoice.setPaymentStatus(payment_status);
-	    invoice.setCart(cart_id);
+	    invoice.setUser(user); // Sửa thành user
 	    invoice.setTotalAmount(totalAmount);
+	    
+	    // Lưu hóa đơn vào cơ sở dữ liệu
 	    invoiceRepository.saveAndFlush(invoice);
+	    
 	    // Chuyển đổi các mục giỏ hàng thành các mục hóa đơn
 	    List<CartItem> cartItems = sessionService.get("cartItems");
 	    if (cartItems != null && !cartItems.isEmpty()) { // Kiểm tra xem cartItems có null hoặc rỗng không
 	        for (CartItem cartItem : cartItems) {
 	            InvoiceItem invoiceItem = new InvoiceItem();
 	            invoiceItem.setInvoice(invoice);
-	            // Gán Product từ cartItem cho invoiceItem
 	            Product product = cartItem.getProductId();
 	            if (product != null) {
 	                invoiceItem.setProduct(product);
 	                invoiceItem.setPrice(product.getPrice()); // Gán giá từ product
 	            } else {
 	                // Xử lý khi product là null (nếu cần thiết)
-	                // Ví dụ: Bỏ qua hoặc ghi log
 	                continue; // Bỏ qua và chuyển sang mục tiếp theo
 	            }
 	            invoiceItem.setQuantity(cartItem.getQuantity()); // Số lượng từ cartItem
@@ -234,9 +263,12 @@ public class Client_PayController {
 	            cartItemRepository.delete(cartItem);
 	        }
 	    }
+	    
+	    // Cập nhật session
 	    sessionService.set("invoice", invoice);
 	    sessionService.remove("cartItems");
-	 // Gửi email xác nhận đơn hàng
+	    
+	    // Gửi email xác nhận đơn hàng
 	    try {
 	        MimeMessage mimeMessage = sender.createMimeMessage();
 	        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -333,7 +365,8 @@ public class Client_PayController {
 	    return "redirect:/products/details/cart/pay/success";
 	}
 
-	@RequestMapping("/products/details/cart/pay/success")
+
+	@RequestMapping("/products/details/cart/pay/success") 
 	public String orderView(Model model) {
 		Invoice invoice = (Invoice) sessionService.get("invoice");
         if (invoice == null) {
@@ -346,5 +379,61 @@ public class Client_PayController {
         return "client/PaySuccess";
 	}
 
+	@PostMapping("/apply-discount")
+	public ResponseEntity<Map<String, Object>> applyDiscount(@RequestBody Map<String, String> payload) {
+	    String discountCode = payload.get("discountCode");
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	        double discountAmount = discountService.getDiscountAmount(discountCode);
+
+	        // Áp dụng giảm giá và tính toán tổng tiền
+	        double currentTotal = cartService.getCurrentTotal(); // Lấy tổng tiền hiện tại từ giỏ hàng
+	        double newTotal = currentTotal - discountAmount + 32000; // Tổng tiền sau khi áp dụng giảm giá và cộng phí vận chuyển
+	        cartService.applyDiscount(discountAmount); // Áp dụng giảm giá
+
+	        response.put("success", true);
+	        response.put("discountAmount", discountAmount);
+	        response.put("total", newTotal); // Trả về tổng tiền sau khi áp dụng giảm giá
+	    } catch (IllegalArgumentException e) {
+	        response.put("success", false);
+	        response.put("message", e.getMessage());
+	    } catch (Exception e) {
+	        response.put("success", false);
+	        response.put("message", "Có lỗi xảy ra, vui lòng thử lại sau.");
+	    }
+	    return ResponseEntity.ok(response);
+	}
+
+
+
+	@PostMapping("/remove-discount")
+	public ResponseEntity<Map<String, Object>> removeDiscount() {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	        double currentTotal = cartService.getCurrentTotal();
+	        double shippingCost = 32000; // Phí vận chuyển
+
+	        // Cập nhật tổng tiền sau khi gỡ bỏ giảm giá
+	        double newTotal = currentTotal + shippingCost;
+	        cartService.removeDiscount(); // Xóa giảm giá trong dịch vụ giỏ hàng
+
+	        response.put("success", true);
+	        response.put("newTotal", newTotal); // Trả về tổng tiền sau khi gỡ bỏ giảm giá
+	    } catch (Exception e) {
+	        response.put("success", false);
+	        response.put("message", "Có lỗi xảy ra, vui lòng thử lại sau.");
+	    }
+	    return ResponseEntity.ok(response);
+	}
+
+
+	private double calculateTotalWithDiscount(double total, double discountAmount) {
+	    return total - discountAmount;
+	}
 
 }
+
+
+
+
+

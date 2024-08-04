@@ -45,8 +45,8 @@ public class Invoice {
 	private String paymentStatus;
 
 	@ManyToOne
-	@JoinColumn(name = "cart_id", nullable = false)
-	private ShoppingCart cart;
+	@JoinColumn(name = "users_id", nullable = false)
+	private User user;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "status_id", nullable = false)
