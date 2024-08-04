@@ -31,7 +31,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "Products", schema = "dbo", catalog = "DUANTN")
+@Table(name = "Products")
 //Khang
 @ToString(exclude = "invoiceItems")
 public class Product {
@@ -42,6 +42,9 @@ public class Product {
 
 	@Column(nullable = false)
 	private String productName;
+	
+	@Column(nullable = false)
+	private float discountPercentage;
 
 	@Column(nullable = false)
 	private float price;
@@ -85,6 +88,10 @@ public class Product {
 	@ManyToOne
 	@JoinColumn(name = "imageId", nullable = false)
 	private Image imageId;
+	
+	@ManyToOne
+	@JoinColumn(name = "statusId", nullable = false)
+	private ProductStatus statusId;
 	
 	@OneToMany(mappedBy = "product")
 	private List<InvoiceItem> invoiceItems;

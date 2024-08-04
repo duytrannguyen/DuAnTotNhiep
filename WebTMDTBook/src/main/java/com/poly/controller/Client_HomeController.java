@@ -2,7 +2,9 @@ package com.poly.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,39 +75,53 @@ public class Client_HomeController {
 	}
 
 	@GetMapping("/products")
-	public String products(Model model, @RequestParam(name = "keyName", required = false) String keyName,
-			@RequestParam("pageNo") Optional<Integer> pageNo,
-			@RequestParam(name = "categoryId", required = false) Integer categoryId) {
+	public String products(Model model, 
+	                       @RequestParam(name = "keyName", required = false) String keyName,
+	                       @RequestParam("pageNo") Optional<Integer> pageNo,
+	                       @RequestParam(name = "categoryId", required = false) Integer categoryId, Object discountedPrice) {
 
-		Sort sort = Sort.by(Direction.DESC, "productId");
-		Pageable pageable = PageRequest.of(pageNo.orElse(0), 10, sort);
+	    Sort sort = Sort.by(Sort.Direction.DESC, "productId");
+	    Pageable pageable = PageRequest.of(pageNo.orElse(0), 10, sort);
 
-		Page<Product> page;
-		if (StringUtils.hasText(keyName)) {
-			page = productRepository.findByProductNameContaining(keyName, pageable);
-		} else if (categoryId != null) {
-			page = productRepository.findProductsByCategory(categoryId, pageable);
-		} else {
-			page = productRepository.findAll(pageable);
-		}
+	    Page<Product> page;
+	    if (StringUtils.hasText(keyName)) {
+	        page = productRepository.findByProductNameContaining(keyName, pageable);
+	    } else if (categoryId != null) {
+	        page = productRepository.findProductsByCategory(categoryId, pageable);
+	    } else {
+	        page = productRepository.findAll(pageable);
+	    }
 
-		List<Integer> totalPages = new ArrayList<>();
-		for (int i = 0; i < page.getTotalPages(); i++) {
-			totalPages.add(i + 1);
-		}
+	    // Khởi tạo Map để lưu giá giảm
+	   
+	    
+	    // Tính giá giảm cho từng sản phẩm
+	    for (Product product : page.getContent()) {
+	        discountedPrice = product.getPrice() - (product.getPrice() * product.getDiscountPercentage() / 100);
+	        
+	    }
 
-		List<Product> products = page.getContent();
-		List<Category> categories = categoryRepository.findAll(Sort.by(Direction.DESC, "categoryId"));
+	    List<Integer> totalPages = new ArrayList<>();
+	    for (int i = 0; i < page.getTotalPages(); i++) {
+	        totalPages.add(i + 1);
+	    }
 
-		model.addAttribute("categories", categories);
-		model.addAttribute("totalPageProduct", totalPages);
-		model.addAttribute("pageProduct", page);
-		model.addAttribute("pageClick", pageNo.orElse(0));
-		model.addAttribute("products", products);
-		model.addAttribute("selectedCategoryId", categoryId);
+	    List<Product> products = page.getContent();
+	    List<Category> categories = categoryRepository.findAll(Sort.by(Sort.Direction.DESC, "categoryId"));
 
-		return "client/Product";
+	    model.addAttribute("categories", categories);
+	    model.addAttribute("totalPageProduct", totalPages);
+	    model.addAttribute("pageProduct", page);
+	    model.addAttribute("pageClick", pageNo.orElse(0));
+	    model.addAttribute("products", products);
+	    model.addAttribute("selectedCategoryId", categoryId);
+	    model.addAttribute("discountedPrice", discountedPrice);
+
+	    return "client/Product";
 	}
+
+
+
 
 	@PostMapping("/products")
 	public String priceProducts(Model model, @RequestParam("pageNo") Optional<Integer> pageNo,
@@ -128,6 +144,8 @@ public class Client_HomeController {
 			page = productRepository.findAll(pageable);
 		}
 
+		 
+     
 		List<Integer> totalPages = new ArrayList<>();
 		for (int i = 0; i < page.getTotalPages(); i++) {
 			totalPages.add(i + 1);
@@ -145,34 +163,50 @@ public class Client_HomeController {
 
 		return "client/Product";
 	}
-
+	
 	@GetMapping("/products/details/{productId}")
 	public String productDetails(Model model, @PathVariable("productId") Integer productId,
-			@RequestParam("pageNo") Optional<Integer> pageNo) {
+	                             @RequestParam("pageNo") Optional<Integer> pageNo) {
 
-		Sort sort = Sort.by(Direction.DESC, "productId");
-		Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
-		Page<Product> page = productRepository.findAll(pageable);
+	    try {
+	        // Lấy sản phẩm chi tiết
+	        Product product = productRepository.findById(productId)
+	                .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
+	        model.addAttribute("product", product);
 
-		List<Integer> totalPages = new ArrayList<Integer>();
-		for (int i = 0; i < page.getTotalPages(); i++) {
-			totalPages.add(i + 1);
-		}
+	        // Tính giá sau khi giảm
+	       
+	            double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
+	            model.addAttribute("discountedPrice", discountedPrice);
+	        
 
-		List<Product> products = page.getContent();
+	        // Phân trang danh sách sản phẩm
+	        Sort sort = Sort.by(Sort.Direction.DESC, "productId");
+	        Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
+	        Page<Product> page = productRepository.findAll(pageable);
 
-		model.addAttribute("totalPageProduct", totalPages);
-		model.addAttribute("pageProduct", page);
-		model.addAttribute("pageClick", pageNo.orElse(0));
+	        List<Integer> totalPages = new ArrayList<>();
+	        for (int i = 0; i < page.getTotalPages(); i++) {
+	            totalPages.add(i + 1);
+	        }
 
-		Product product = productRepository.findById(productId).get();
-		model.addAttribute("product", product);
+	        List<Product> products = page.getContent();
 
-		model.addAttribute("products", products);
+	        model.addAttribute("totalPageProduct", totalPages);
+	        model.addAttribute("pageProduct", page);
+	        model.addAttribute("pageClick", pageNo.orElse(0));
+	        model.addAttribute("products", products);
 
-		return "client/ProductDetails";
-
+	        return "client/ProductDetails";
+	        
+	    } catch (Exception e) {
+	        // Ghi log lỗi
+	        e.printStackTrace();
+	        return "error"; // Trả về trang lỗi nếu xảy ra ngoại lệ
+	    }
 	}
+
+
 
 //	@GetMapping("products/details/cart")
 //	public String Cart(Model model) {
