@@ -166,8 +166,9 @@ public class Client_PayController {
 	    cartItem.setQuantity(1); // Thiết lập số lượng mặc định (có thể điều chỉnh tùy theo yêu cầu)
 	    cartItemRepository.save(cartItem);
 
-	    // Lấy lại danh sách CartItem từ shoppingCart
+	    // Xóa các sản phẩm đã chọn từ giỏ hàng khi người dùng quay lại
 	    List<CartItem> cartItems = cartItemRepository.findByShoppingCart(shoppingCart);
+	    cartItemRepository.deleteAll(cartItems);
 
 	    // Tính toán tổng tiền
 	    double total = 0;
@@ -185,17 +186,15 @@ public class Client_PayController {
 	    model.addAttribute("total", total);
 
 	    Address defaultAddress = user.getAddresses().stream()
-                .filter(Address::isStatus)
-                .findFirst()
-                .orElse(null);
-if (defaultAddress != null) {
-System.out.println("Default Address: " + defaultAddress);
-} else {
-System.out.println("Default Address is null");
-}
-model.addAttribute("address", defaultAddress);
-
-
+	            .filter(Address::isStatus)
+	            .findFirst()
+	            .orElse(null);
+	    if (defaultAddress != null) {
+	        System.out.println("Default Address: " + defaultAddress);
+	    } else {
+	        System.out.println("Default Address is null");
+	    }
+	    model.addAttribute("address", defaultAddress);
 
 	    // Tạo đối tượng invoice và thêm vào model
 	    Invoice invoice = new Invoice();
@@ -206,13 +205,14 @@ model.addAttribute("address", defaultAddress);
 	}
 
 
+
 	@PostMapping("/products/details/cart/pay")
 	public String pay(@ModelAttribute("invoice") Invoice invoice, 
-	                  @RequestParam("status_id") int status_id,
-	                  @RequestParam("payment_method_id") int payment_method_id,
-	                  @RequestParam("payment_status") String payment_status,
-	                  @RequestParam("shipping_id") int shipping_id,
-	                  @RequestParam("totalAmount") double totalAmount,
+	                  @RequestParam("status") Integer status,
+	                  @RequestParam("payment_method_id") Integer payment_method_id,
+//	                  @RequestParam("payment_status") String payment_status,
+	                  @RequestParam("shipping_id") Integer shipping_id,
+	                  @RequestParam(name = "totalAmount") double totalAmount,
 	                  HttpSession session,
 	                  Model model) {
 	    // Lấy thông tin người dùng từ session
@@ -226,7 +226,7 @@ model.addAttribute("address", defaultAddress);
 	    shipping.setShipping_id(shipping_id); // Đảm bảo rằng shipping_id là giá trị hợp lệ
 
 	    OrderStatus orderStatus = new OrderStatus();
-	    orderStatus.setStatusId(status_id);
+	    orderStatus.setStatusId(status);
 	    PaymentMethod paymentMethod = new PaymentMethod();
 	    paymentMethod.setPaymentMethodId(payment_method_id); // Sử dụng id từ radio button
 	    
@@ -235,7 +235,7 @@ model.addAttribute("address", defaultAddress);
 	    invoice.setPaymentMethod(paymentMethod);
 	    invoice.setShipping(shipping);
 	    invoice.setPaymentDate(new Date());
-	    invoice.setPaymentStatus(payment_status);
+//	    invoice.setPaymentStatus(payment_status);
 	    invoice.setUser(user); // Sửa thành user
 	    invoice.setTotalAmount(totalAmount);
 	    

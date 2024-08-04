@@ -62,6 +62,7 @@
                                 <li class="nav-item"><a href="/home/about" class="nav-link">Giới Thiệu</a></li>
                                 <li class="nav-item"><a href="/home/contact" class="nav-link">Liên Hệ</a></li>
                                 <li class="nav-item"><a href="/home/products" class="nav-link">Sản Phẩm</a></li>
+                                <li class="nav-item"><a href="/home/products/details/cart" class="nav-link"><i class="fa-solid fa-cart-shopping"></i></a></li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" id="accountDropdown" role="button" data-bs-toggle="dropdown"
                                         aria-expanded="false">
@@ -73,20 +74,25 @@
                                         </th:block>
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                                        <th:block th:if="${session.user != null}">
-                                            <li><a class="dropdown-item" href="#">Cập Nhật Thông Tin</a></li>
-                                            <li><a class="dropdown-item" href="/home/login/changePassword">Đổi Mật Khẩu</a></li>
-                                            <li><a class="dropdown-item" href="/home/products/details/cart">Giỏ Hàng</a></li>
-                                            <li><a class="dropdown-item" href="#">Đơn Hàng Đã Mua</a></li>
-                                            <li><a class="dropdown-item" href="#">Lịch Sử Đơn Hàng</a></li>
-                                            <li><a class="dropdown-item" href="/home/logout">Đăng Xuất</a></li>
-                                        </th:block>
-                                        <th:block th:if="${session.user == null}">
-                                            <li><a class="dropdown-item" href="/home/dangky">Đăng Ký</a></li>
-                                            <li><a class="dropdown-item" href="/home/login">Đăng Nhập</a></li>
-                                            <li><a class="dropdown-item" href="/home/forgot-password">Quên Mật Khẩu</a></li>
-                                        </th:block>
-                                    </ul>
+    <th:block th:if="${session.user != null}">
+    <th:block th:if="${session.user.roleId != null and session.user.roleId.roleId == 1}">
+            <li><a class="dropdown-item" href="/admin/voucher/list">Truy Cập Admin</a></li>
+        </th:block>
+        <li><a class="dropdown-item" href="#">Đơn Hàng Đã Mua</a></li>
+        <li><a class="dropdown-item" href="#">Lịch Sử Đơn Hàng</a></li>
+        <li><a class="dropdown-item" href="#">Cập Nhật Thông Tin</a></li>
+        <li><a class="dropdown-item" href="/home/login/changePassword">Đổi Mật Khẩu</a></li>
+        <li><a class="dropdown-item" href="/home/products/details/cart">Giỏ Hàng</a></li>
+        <li><a class="dropdown-item" href="/home/logout">Đăng Xuất</a></li>
+    </th:block>
+    <th:block th:if="${session.user == null}">
+        <li><a class="dropdown-item" href="/home/dangky">Đăng Ký</a></li>
+        <li><a class="dropdown-item" href="/home/login">Đăng Nhập</a></li>
+        <li><a class="dropdown-item" href="/home/forgot-password">Quên Mật Khẩu</a></li>
+    </th:block>
+</ul>
+
+
                                    
                                 </li>
                             </ul>

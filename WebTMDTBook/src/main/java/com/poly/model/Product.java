@@ -49,8 +49,8 @@ public class Product {
 	@Column(nullable = false)
 	private float price;
 
-	@Column(nullable = false)
-	private float discountPercentage;
+//	@Column(nullable = false)
+//	private float discountPercentage;
 	
 	@Column(nullable = false)
 	private int publishingYear;
