@@ -60,37 +60,7 @@
 									href="/home/index" class="nav-link">Web</a></li>
 							</ul>
 						</div>
-						<!-- <div class="col-md-5">
-							Right navbar links
-							<ul class="navbar-nav ms-auto">
-								Navbar Search
-								<li class="nav-item">
-									<div class="collapse navbar-collapse" id="navbarSearch">
-										<form class="d-flex mb-3" role="search">
-											<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-											<button class="btn btn-outline-secondary" type="submit">Search</button>
-										</form>
-									</div>
-								</li>
-								Notifications Dropdown Menu
-								<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"> <i class="far fa-bell"></i> <span class="badge bg-warning navbar-badge">15</span>
-								</a>
-									<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-										<span class="dropdown-header">15 Notifications</span>
-										<div class="dropdown-divider"></div>
-										<a href="#" class="dropdown-item"> <i class="fas fa-envelope mr-2"></i> 4 new messages <span class="float-end text-muted text-sm">3 mins</span>
-										</a>
-										<div class="dropdown-divider"></div>
-										<a href="#" class="dropdown-item"> <i class="fas fa-users mr-2"></i> 8 friend requests <span class="float-end text-muted text-sm">12 hours</span>
-										</a>
-										<div class="dropdown-divider"></div>
-										<a href="#" class="dropdown-item"> <i class="fas fa-file mr-2"></i> 3 new reports <span class="float-end text-muted text-sm">2 days</span>
-										</a>
-										<div class="dropdown-divider"></div>
-										<a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-									</div></li>
-							</ul>
-						</div> -->
+						
 					</div>
 				</div>
 			</div>
@@ -141,8 +111,8 @@
         <p>KHÁCH HÀNG</p>
       </a>
       <ul class="collapse nav flex-column ms-3" id="customerMenu">
-        <li class="nav-item"><a href="/admin/customers/list" class="nav-link">Danh Sách Khách Hàng</a></li>
-        <li class="nav-item"><a href="/admin/customers/storage" class="nav-link">Lưu Trữ Khách Hàng</a></li>
+        <li class="nav-item"><a href="/admin/client/list" class="nav-link">Danh Sách Khách Hàng</a></li>
+        <li class="nav-item"><a href="/admin/client/storage" class="nav-link">Lưu Trữ Khách Hàng</a></li>
       </ul>
     </li>
     <li class="nav-item">
@@ -165,8 +135,8 @@
             <p>Loại Sản Phẩm</p>
           </a>
           <ul class="collapse nav flex-column ms-3" id="typeProductMenu">
-            <li class="nav-item"><a href="/admin/product-type/list" class="nav-link">Danh Sách Loại</a></li>
-            <li class="nav-item"><a href="/admin/product-type/storage" class="nav-link">Loại Sản Phẩm Lưu Trữ</a></li>
+            <li class="nav-item"><a href="/admin/Category" class="nav-link">Danh Sách Loại</a></li>
+            <li class="nav-item"><a href="/admin/Category/storage" class="nav-link">Loại Sản Phẩm Lưu Trữ</a></li>
           </ul>
         </li>
       </ul>
@@ -209,7 +179,7 @@
 			<!-- Content Header (Page header) -->
 			<div class="content-header">
 				<div class="container-fluid">
-					<section th:replace="${view}"></section>
+					<section th:replace="~{${view}}"></section>
 				</div>
 			</div>
 		</div>

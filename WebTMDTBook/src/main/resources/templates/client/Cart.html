@@ -46,7 +46,7 @@ a {
 </head>
 <body>
 	<!-- Thay thế jsp:include bằng Thymeleaf th:replace -->
-	<div th:replace="client_layout/header :: header"></div>
+	<div th:replace="~{client_layout/header :: header}"></div>
 	<br>
 	<br>
 	<br>
@@ -94,7 +94,7 @@ a {
 											</tr>
 										</thead>
 										<tbody>
-											<tr th:each="item : ${cartItems}">
+											<tr th:each="item  : ${cartItems}">
 												<form th:action="@{/cart/update}" method="post">
 													<input th:value="${item.cartItemId}" name="cartItemId"
 														type="hidden" />
@@ -115,14 +115,16 @@ a {
 														<button type="button" class="btn btn-secondary btn-sm"
 															onclick="incrementValue(this.previousElementSibling)">+</button>
 													</td>
-													<td><b th:text="${discountedPrice} + ' VNĐ'"></b></td>
 													<td><b
-														th:text="${discountedPrice * item.quantity} + ' VNĐ'"></b></td>
+														th:text="${item.productId.price - ((item.productId.price * item.productId.discountPercentage) / 100)} + ' VNĐ'"></b></td>
+													<td><b
+														th:text="${(item.productId.price - ((item.productId.price * item.productId.discountPercentage) / 100)) * item.quantity} + ' VNĐ'"></b></td>
 													<td><a
 														th:href="@{/cart/remove/{cartItemId}(cartItemId=${item.cartItemId})}"><i
 															class="fa-solid fa-trash" style="color: #ed2323;"></i></a></td>
 												</form>
 											</tr>
+											
 										</tbody>
 									</table>
 								</div>
@@ -166,7 +168,7 @@ a {
 	</div>
 	<!-- Thay thế jsp:include bằng Thymeleaf th:replace -->
 
-	<div th:replace="client_layout/footer :: footer"></div>
+	<div th:replace="~{client_layout/footer :: footer}"></div>
 
 	<script type="text/javascript">
     // Function to handle checkbox state changes

@@ -90,8 +90,8 @@ public class Client_HomeController {
 	    // Thêm cả hai danh sách vào mô hình để có thể sử dụng trong view
 	    model.addAttribute("currentProducts", currentProducts);
 	    model.addAttribute("upcomingProducts", upcomingProducts);
-
-	    List<Category> categories = categoryService.getAllCategory(); // Lấy tất cả danh mục
+	    //Chỉ lấy danh mục loại sàn phẩm ở trạng thấy On
+	    List<Category> categories = categoryRepository.findAllCategoriesStatusId1() ;
 	    model.addAttribute("categories", categories); // Thêm danh sách danh mục vào mô hình
 	    
 	    return "indexClient"; // Trả về view indexClient
@@ -108,7 +108,8 @@ public class Client_HomeController {
 	public String products(Model model, 
 	                       @RequestParam(name = "keyName", required = false) String keyName,
 	                       @RequestParam("pageNo") Optional<Integer> pageNo,
-	                       @RequestParam(name = "categoryId", required = false) Integer categoryId, Object discountedPrice) {
+	                       @RequestParam(name = "categoryId", required = false) Integer categoryId,
+	                       @RequestParam(name = "productId", required = false) Integer productId) {
 
 	    Sort sort = Sort.by(Sort.Direction.DESC, "productId");
 	    Pageable pageable = PageRequest.of(pageNo.orElse(0), 10, sort);
@@ -122,15 +123,6 @@ public class Client_HomeController {
 	        page = productRepository.findAll(pageable);
 	    }
 
-	    // Khởi tạo Map để lưu giá giảm
-	   
-	    
-	    // Tính giá giảm cho từng sản phẩm
-	    for (Product product : page.getContent()) {
-	        discountedPrice = product.getPrice() - (product.getPrice() * product.getDiscountPercentage() / 100);
-	        
-	    }
-
 	    List<Integer> totalPages = new ArrayList<>();
 	    for (int i = 0; i < page.getTotalPages(); i++) {
 	        totalPages.add(i + 1);
@@ -139,17 +131,23 @@ public class Client_HomeController {
 	    List<Product> products = page.getContent();
 	    List<Category> categories = categoryRepository.findAll(Sort.by(Sort.Direction.DESC, "categoryId"));
 
+	    // Tính toán giá giảm giá cho từng sản phẩm
+	    List<Double> discountedPrices = new ArrayList<>();
+	    for (Product product : products) {
+	        double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
+	        discountedPrices.add(discountedPrice);
+	    }
+
 	    model.addAttribute("categories", categories);
 	    model.addAttribute("totalPageProduct", totalPages);
 	    model.addAttribute("pageProduct", page);
 	    model.addAttribute("pageClick", pageNo.orElse(0));
 	    model.addAttribute("products", products);
+	    model.addAttribute("discountedPrices", discountedPrices);
 	    model.addAttribute("selectedCategoryId", categoryId);
-	    model.addAttribute("discountedPrice", discountedPrice);
 
 	    return "client/Product";
 	}
-
 
 
 
@@ -257,7 +255,7 @@ public class Client_HomeController {
 		return "client/About";
 	}
 
-	@GetMapping("/Contact")
+	@GetMapping("/contact")
 	public String Contact() {
 		return "client/Contact";
 	}
