@@ -55,7 +55,7 @@ color: white;
 </head>
 <body>
 <div class="main-banner">
-	<header th:insert="client_layout/header :: header"></header>
+	<div th:insert="~{client_layout/header :: header}"></div>
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-6 align-self-center">
@@ -96,7 +96,7 @@ color: white;
 							<img
 								th:src="@{/Image_SP/{imageName}(imageName=${product.imageId.imageName})}"
 								alt="" style="height: 400px;">
-							<div class="down-content">
+							<div class="down-content" style="color: white;">
 								<h4 class="book-title"
 									style="color: white; max-width: 100%; word-wrap: break-word;"
 									th:text="${product.productName}"></h4>

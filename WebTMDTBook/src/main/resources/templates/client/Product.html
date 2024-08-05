@@ -103,7 +103,7 @@ body, html {
 
 
 <body>
-	<div th:replace="client_layout/header :: header"></div>
+	<div th:replace="~{client_layout/header :: header}"></div>
 	<div class="page-heading normal-space">
 		<div class="container-fluid">
 			<div class="row">
@@ -297,11 +297,12 @@ body, html {
 <!-- 						======= di -->
 												<h6>DANH SÁCH SẢN PHẨM</h6>
 						<div class="row row-cols-1 row-cols-md-4 g-4">
-							<div th:each="p : ${products}">
+							<div th:each="p, iterStat : ${products}">
 								<div class="col">
 									<a th:href="@{/home/products/details/{id}(id=${p.productId})}"
 										class="a-product text-decoration-none">
 										<div class="card h-100 border-0 shadow-sm hover-shadow-lg">
+
 											<img
 												th:src="@{/Image_SP/{imageName}(imageName=${p.imageId.imageName})}"
 												class="card-img-top"
@@ -311,7 +312,7 @@ body, html {
 												<p th:text="${p.author}"></p>
 												<div class="d-flex flex-column">
 													<h5 style="color: red; font-weight: 700"
-														th:text="${discountedPrice} + ' VNĐ'"></h5>
+														th:text="${discountedPrices[iterStat.index]} + 'VNĐ'"></h5>
 												</div>
 												<p class="giamGia">
 													<a th:text="${p.price}"></a> <a
@@ -320,12 +321,16 @@ body, html {
 														th:text="${p.discountPercentage}"></b>%
 													</a>
 												</p>
+
+
 											</div>
 										</div>
 									</a>
 								</div>
+
 							</div>
 						</div>
+						
 						<br>
 						<!-- PHÂN TRANG -->
 											<div class="card-footer d-flex justify-content-center">
@@ -353,7 +358,7 @@ body, html {
 		</div>
 	</div>
 
-	<div th:insert="client_layout/footer :: footer"></div>
+	<div th:insert="~{client_layout/footer :: footer}"></div>
 
 	<script>
         // của thể loại
