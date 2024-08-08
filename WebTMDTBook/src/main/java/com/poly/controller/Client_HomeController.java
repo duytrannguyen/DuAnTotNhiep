@@ -59,14 +59,6 @@ public class Client_HomeController {
 	@Autowired
 	CategoryService categoryService;
 
-//	@GetMapping("/index")
-//	public String home(Model model) {
-//		List<Product> products = productService.getAllProducts();
-//		model.addAttribute("products", products);
-//		List<Category> categories = categoryService.getAllCategory();
-//		model.addAttribute("categories", categories);
-//		return "indexClient";
-//	}
 	@GetMapping("/index")
 	public String home(Model model) {
 	    List<Product> products = productService.getAllProducts(); // Lấy tất cả sản phẩm
