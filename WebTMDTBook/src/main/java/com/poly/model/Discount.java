@@ -1,6 +1,7 @@
 package com.poly.model;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -63,9 +64,12 @@ public class Discount {
 	Double minInvoiceAmount;
 	
 	@Column(name = "status_id")
-    private Integer statusId ; 
+     Integer statusId ; 
 	
+	@OneToMany(mappedBy = "discount")
+     List<DiscountDetail> DiscountDetail;
 	public boolean isValid() {
 		return startDate != null && endDate != null && !startDate.after(endDate);
 	}
+	
 }

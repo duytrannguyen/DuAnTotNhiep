@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.poly.model.Discount;
+import com.poly.model.DiscountDetail;
+import com.poly.model.Invoice;
+import com.poly.model.User;
+import com.poly.repository.DiscountDetailReponsitory;
 import com.poly.repository.DiscountRepositopy;
 
 //@Service
@@ -39,7 +43,8 @@ import com.poly.repository.DiscountRepositopy;
 //}
 @Service
 public class DiscountService {
-
+	 @Autowired
+	    private DiscountDetailReponsitory discountDetailReponsitory;
     @Autowired
     private DiscountRepositopy discountRepository;
 
@@ -67,6 +72,24 @@ public class DiscountService {
         // Trả về giá trị giảm giá
         return discount.getDiscountValue();
     }
+    public Integer getDiscountIdByCode(String discountCode) {
+    	Optional<Discount> discount = discountRepository.findByDiscountCode(discountCode);
+        return discount.isPresent() ? discount.get().getDiscountId() : null;
+    }
+    
+    //mỗi user dùng 1 lần /voucher
+    public boolean hasUserUsedDiscount(User user, Discount discount) {
+        Optional<DiscountDetail> usage = discountDetailReponsitory.findByUserAndDiscount(user, discount);
+        return usage.isPresent();
+    }
 
+    public void saveVoucherUsage(User user, Discount discount, Invoice invoice) {
+    	DiscountDetail usage = new DiscountDetail();
+        usage.setUser(user);
+        usage.setDiscount(discount);
+        usage.setInvoice(invoice);
+        usage.setUsedDate(new Date());
+        discountDetailReponsitory.save(usage);
+    }
     // Các phương thức khác của DiscountService
 }

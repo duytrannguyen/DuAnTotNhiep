@@ -144,8 +144,8 @@ form {
                             </div>
                             <div class="col-auto">
                                 <div class="input-group">
-                                    <input type="text" id="discountCode" class="form-control w-auto" placeholder="Nhập mã khuyến mãi" oninput="handleDiscountInput()">
-                                    <div class="input-group-append">
+                                     <input type="text" id="discountCode" class="form-control w-auto" name="discount_code" placeholder="Nhập mã khuyến mãi" oninput="handleDiscountInput()">
+    <input type="hidden" id="discountIdHiddenInput" name="discount_id"> <div class="input-group-append">
                                         <button class="btn btn-primary btn-xs col-auto" type="button" onclick="applyDiscount()">Áp dụng</button>
                                     </div>
                                 </div>
