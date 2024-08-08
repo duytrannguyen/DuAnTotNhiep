@@ -41,12 +41,12 @@ public class Invoice {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date paymentDate;
 
-	@Column(nullable = false)
-	private String paymentStatus;
+//	@Column(nullable = false)
+//	private String paymentStatus;
 
 	@ManyToOne
-	@JoinColumn(name = "cart_id", nullable = false)
-	private ShoppingCart cart;
+	@JoinColumn(name = "users_id", nullable = false)
+	private User user;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "status_id", nullable = false)

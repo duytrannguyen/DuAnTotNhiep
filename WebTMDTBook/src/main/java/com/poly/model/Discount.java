@@ -31,7 +31,7 @@ public class Discount {
 
 	@Column(nullable = false)
 	@NotNull(message = "{NotNull.vc.quantity}")
-	@Min(value = 1, message = "{Min.vc.quantity}")
+	//@Min(value = 1, message = "{Min.vc.quantity}")
 	@Max(value = 100, message = "{Max.vc.quantity}")
 	Integer quantity;
 
@@ -61,6 +61,9 @@ public class Discount {
 	@NotNull(message = "{NotNull.vc.minInvoiceAmount}")
 	@Min(value = 0, message = "{Min.vc.minInvoiceAmount}")
 	Double minInvoiceAmount;
+	
+	@Column(name = "status_id")
+    private Integer statusId ; 
 	
 	public boolean isValid() {
 		return startDate != null && endDate != null && !startDate.after(endDate);

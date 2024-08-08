@@ -42,9 +42,10 @@ public class ProductService {
 		return (int) productRepository.count();
 	}
 
-	public boolean existsByProductName(String productName) {
-		return productRepository.existsByProductName(productName);
-	}
+	// Kiểm tra xem sản phẩm đã tồn tại hay chưa
+    public boolean existsByProductName(String productName) {
+        return productRepository.existsByProductName(productName);
+    }
 
 //    lọc sản phẩm
 

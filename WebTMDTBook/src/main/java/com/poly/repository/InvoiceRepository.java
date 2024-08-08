@@ -17,18 +17,18 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
 	@Query("SELECT SUM(i.totalAmount) FROM Invoice i")
 	Double findTotalAmount();
 
-	@Query("SELECT COUNT(i) FROM Invoice i JOIN i.status s WHERE s.statusName = :statusName")
-	Long countByStatusStatusName(@Param("statusName") String statusName);
+//	@Query("SELECT COUNT(i) FROM Invoice i JOIN i.status s WHERE s.statusName = :statusName")
+//	Long countByStatusStatusName(@Param("statusName") String statusName);
 
-	List<Invoice> findByInvoiceIdOrCartUserFullNameContaining(Integer invoiceId, String fullName);
+//	List<Invoice> findByInvoiceIdOrCartUserFullNameContaining(Integer invoiceId, String fullName);
 
 	@Query("SELECT COUNT(i) FROM Invoice i")
 	Long countTotalOrders();
 
 	//Khang
-	@Query("SELECT i FROM Invoice i " + "JOIN FETCH i.cart c " + "JOIN FETCH c.user u " + "JOIN FETCH i.status s "
-			+ "JOIN FETCH i.paymentMethod pm")
-	List<Invoice> findAllInvoicesWithDetails();
+//	@Query("SELECT i FROM Invoice i " + "JOIN FETCH i.cart c " + "JOIN FETCH c.user u " + "JOIN FETCH i.status s "
+//			+ "JOIN FETCH i.paymentMethod pm")
+//	List<Invoice> findAllInvoicesWithDetails();
 
 	//Khang
 	List<Invoice> findByStatusStatusName(String statusName);
