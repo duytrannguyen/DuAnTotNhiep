@@ -62,7 +62,7 @@ public class Home_Controller {
 	                if (user.getRoleId().getRoleId() == 1) {
 	                    // Chuyển hướng đến trang quản trị nếu người dùng là admin
 	                    model.addAttribute("successMessage", "Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
-	                    return "redirect:/home/index";
+	                    return "redirect:/admin/products/list";
 	                } else {
 	                    // Chuyển hướng đến trang chính cho người dùng không phải admin
 	                    model.addAttribute("successMessage", "Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
