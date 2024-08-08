@@ -63,20 +63,20 @@ public class JwtService {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-//    // Tạo JWT mới với tên người dùng
-//    public String GenerateToken(String username){
-//        Map<String, Object> claims = new HashMap<>();
-//        return createToken(claims, username);
-//    }
-//
-//    // Tạo JWT với claims và tên người dùng
-//    private String createToken(Map<String, Object> claims, String username) {
-//        return Jwts.builder()
-//                .setClaims(claims) // Thiết lập các claims
-//                .setSubject(username) // Thiết lập chủ thể là tên người dùng
-//                .setIssuedAt(new Date(System.currentTimeMillis())) // Thiết lập ngày phát hành
-//                .setExpiration(new Date(System.currentTimeMillis()+1000*60*10)) // Thiết lập ngày hết hạn
-//                .signWith(getSignKey(), SignatureAlgorithm.HS256) // Ký JWT với khóa và thuật toán HS256
-//                .compact(); // Tạo JWT
-//    }
+    // Tạo JWT mới với tên người dùng
+    public String GenerateToken(String username){
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, username);
+    }
+
+    // Tạo JWT với claims và tên người dùng
+    private String createToken(Map<String, Object> claims, String username) {
+        return Jwts.builder()
+                .setClaims(claims) // Thiết lập các claims
+                .setSubject(username) // Thiết lập chủ thể là tên người dùng
+                .setIssuedAt(new Date(System.currentTimeMillis())) // Thiết lập ngày phát hành
+                .setExpiration(new Date(System.currentTimeMillis()+1000*60*10)) // Thiết lập ngày hết hạn
+                .signWith(getSignKey(), SignatureAlgorithm.HS256) // Ký JWT với khóa và thuật toán HS256
+                .compact(); // Tạo JWT
+    }
 }
