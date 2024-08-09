@@ -24,9 +24,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.poly.config.PayOSConfig;
 import com.poly.config.VNPAYConfig;
 import com.poly.model.Address;
 import com.poly.model.CartItem;
+import com.poly.model.CreatePaymentLinkRequestBody;
 import com.poly.model.Discount;
 import com.poly.model.Invoice;
 import com.poly.model.InvoiceItem;
@@ -44,12 +48,18 @@ import com.poly.repository.ShoppingCartRepository;
 import com.poly.repository.UserRepository;
 import com.poly.service.CartService;
 import com.poly.service.DiscountService;
+//import com.poly.service.PayOSService;
 import com.poly.service.SessionService;
 import com.poly.util.VNPayUtil;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import vn.payos.PayOS;
+import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.ItemData;
+import vn.payos.type.PaymentData;
+
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
@@ -76,6 +86,10 @@ public class Client_PayController {
 	DiscountService discountService;
 	@Autowired
 	VNPAYConfig vnPayConfig;
+	@Autowired
+	PayOSConfig payOSConfig;
+	@Autowired
+	PayOS payOS;
 
 	@RequestMapping("/products/details/cart/pay")
 	public String pay(@RequestParam("cartItemIds") String cartItemIds, Model model) {
@@ -102,9 +116,7 @@ public class Client_PayController {
 					total += cartItem.getQuantity() * cartItem.getProductId().getPrice();
 					cartItems.add(cartItem);
 				} else {
-					// Handle case where cart item with given id is not found
-					// You may redirect to an error page or handle it as per your application's
-					// logic
+
 					return "errorpage";
 				}
 			} catch (NumberFormatException e) {
@@ -135,7 +147,7 @@ public class Client_PayController {
 		if (user == null) {
 			return "redirect:/home/login"; // Chuyển hướng đến trang đăng nhập nếu người dùng chưa đăng nhập
 		}
-		// Tìm giỏ hàng hiện tại của người dùng
+////		// Tìm giỏ hàng hiện tại của người dùng
 		ShoppingCart shoppingCart = shoppingCartRepository.findByUser(user);
 		if (shoppingCart == null) {
 			// Nếu không tìm thấy giỏ hàng, tạo mới một giỏ hàng
@@ -153,7 +165,7 @@ public class Client_PayController {
 		CartItem cartItem = new CartItem();
 		cartItem.setShoppingCart(shoppingCart);
 		cartItem.setProductId(product);
-		cartItem.setQuantity(1); // Thiết lập số lượng mặc định (có thể điều chỉnh tùy theo yêu cầu)
+		cartItem.setQuantity(1); // Thiết lập số lượng mặc định
 		cartItemRepository.save(cartItem);
 		// Xóa các sản phẩm đã chọn từ giỏ hàng khi người dùng quay lại
 		List<CartItem> cartItems = cartItemRepository.findByShoppingCart(shoppingCart);
@@ -177,20 +189,20 @@ public class Client_PayController {
 			System.out.println("Default Address is null");
 		}
 		model.addAttribute("address", defaultAddress);
-
 		// Tạo đối tượng invoice và thêm vào model
 		Invoice invoice = new Invoice();
 		model.addAttribute("invoice", invoice);
-
 		// Chuyển hướng đến trang thanh toán
 		return "client/Pay";
 	}
 
 	@PostMapping("/products/details/cart/pay")
 	public String pay(@ModelAttribute("invoice") Invoice invoice, @RequestParam("status") Integer status,
-			@RequestParam("payment_method_id") Integer paymentMethodId, @RequestParam("shipping_id") Integer shippingId,
-			@RequestParam(name = "totalAmount") double totalAmount, HttpSession session, HttpServletRequest request,
-			Model model) throws Exception {
+			@RequestParam("productName") String productName, @RequestParam("payment_method_id") Integer payment_method_id,
+			@RequestParam("shipping_id") Integer shippingId, @RequestParam(name = "totalAmount") double totalAmount,
+			@RequestParam(name = "quantity") int quantity, @RequestParam(name = "price") double price,
+			HttpSession session, HttpServletRequest request, Model model, HttpServletResponse httpServletResponse)
+			throws Exception {
 		// Lấy thông tin người dùng từ session
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
@@ -202,7 +214,7 @@ public class Client_PayController {
 		OrderStatus orderStatus = new OrderStatus();
 		orderStatus.setStatusId(status);
 		PaymentMethod paymentMethod = new PaymentMethod();
-		paymentMethod.setPaymentMethodId(paymentMethodId);
+		paymentMethod.setPaymentMethodId(payment_method_id);
 		// Cập nhật thông tin hóa đơn
 		invoice.setStatus(orderStatus);
 		invoice.setPaymentMethod(paymentMethod);
@@ -211,7 +223,7 @@ public class Client_PayController {
 		invoice.setUser(user); // Sửa thành user
 		invoice.setTotalAmount(totalAmount);
 		// Nếu phương thức thanh toán là VNPay, chuyển hướng đến cổng thanh toán VNPay
-		if (paymentMethodId == 2) {
+		if (payment_method_id == 2) {
 			// Tạo yêu cầu VNPay
 			Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig(request);
 			long amount = (long) (totalAmount * 100); // Quy đổi số tiền thành VND
@@ -222,68 +234,64 @@ public class Client_PayController {
 			// Tạo URL yêu cầu thanh toán VNPay
 			String queryUrl = VNPayUtil.getPaymentURL(vnpParamsMap, vnPayConfig.getSecretKey());
 			String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
+			System.out.println("orderId "+invoice.getInvoiceId());
 			System.out.println("URL yêu cầu VNPay: " + paymentUrl);
 			// Lưu hóa đơn vào session để sử dụng sau khi thanh toán thành công
 			session.setAttribute("invoice", invoice);
 			session.setAttribute("cartItems", sessionService.get("cartItems"));
 			return "redirect:" + paymentUrl;
+		} 
+		if (payment_method_id == 3) {
+		    // Tạo đối tượng yêu cầu thanh toán
+		    final String returnUrl = "http://localhost:8080/success";
+		    final String cancelUrl = "http://localhost:8080/cancel";
+		    String currentTimeString = String.valueOf(new Date().getTime());
+		    long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
+		    final String description = user.getUsername()+ " " + orderCode;
+//		    System.out.println(orderCode);
+		    ItemData item = ItemData.builder()
+		            .name(productName)
+		            .quantity(quantity)
+		            .price((int) price)
+		            .build();
+		    PaymentData paymentData = PaymentData.builder()
+		            .orderCode(orderCode)
+		            .amount((int) totalAmount)
+		            .description(description)
+		            .returnUrl(returnUrl)
+		            .cancelUrl(cancelUrl)
+		            .item(item)
+		            .build();
+		    
+		    try {
+		        // Tạo liên kết thanh toán với PayOS
+		        CheckoutResponseData responseData = payOS.createPaymentLink(paymentData);
+		        String checkoutUrl = responseData.getCheckoutUrl();
+		        
+		        // Lưu thông tin hóa đơn vào cơ sở dữ liệu và session
+		        session.setAttribute("invoice", invoice);
+		        session.setAttribute("cartItems", session.getAttribute("cartItems"));
+		        // Chuyển hướng đến trang thanh toán
+		        return "redirect:" + checkoutUrl;
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        // Xử lý lỗi
+		        return "redirect:/error";
+		    }
 		}
+
 		// Lưu hóa đơn vào cơ sở dữ liệu cho các phương thức thanh toán khác
 		invoiceRepository.saveAndFlush(invoice);
 		saveInvoiceItems(session, invoice);
 		sessionService.remove("cartItems");
 		model.addAttribute("orderId", invoice.getInvoiceId());
 		model.addAttribute("totalAmount", invoice.getTotalAmount());
-		model.addAttribute("paymentMethodId", invoice.getPaymentMethod().getPaymentMethodName());
+		model.addAttribute("payment_method_id", invoice.getPaymentMethod().getPaymentMethodName());
 		model.addAttribute("orderTime", invoice.getPaymentDate());
-		
-		//gửi mail
-		try {
-			MimeMessage mimeMessage = sender.createMimeMessage();
-			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-			mimeMessageHelper.setFrom("lyt8073@gmail.com");
-			mimeMessageHelper.setTo(user.getEmail());
-			mimeMessageHelper.setSubject("Xác nhận đơn hàng #" + invoice.getInvoiceId());
-			String addresses = user.getAddresses().stream().map(Address::toString).collect(Collectors.joining(", "));
-			String htmlContent = "<!DOCTYPE html>" + "<html lang='en'>" + "<head>" + "<meta charset='UTF-8'>"
-					+ "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
-					+ "<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH' crossorigin='anonymous'>"
-					+ "<title>Order Confirmation</title>" + "<style type='text/css'>"
-					+ "body { font-family: Arial, sans-serif; }" + ".container { margin-top: 50px; }"
-					+ ".card { padding: 20px; }" + ".card-header { background-color: #007bff; color: white; }"
-					+ ".card-body { margin-top: 20px; }" + ".text-center { text-align: center; }"
-					+ ".fw-bold { font-weight: bold; }" + ".text-primary { color: #007bff; }" + "</style>" + "</head>"
-					+ "<body>" + "<div class='container'>" + "<div class='card'>" + "<div class='card-header'>"
-					+ "<h4>Order Confirmation</h4>" + "</div>" + "<div class='card-body'>"
-					+ "<h5 class='text-center fw-bold text-primary'>Cảm Ơn Bạn Đã Đặt Hàng Tại QLBook</h5>"
-					+ "<div class='card'>" + "<p>Chào " + user.getFullName() + ",</p>"
-					+ "<span>QLBook đã nhận được yêu cầu đặt hàng của bạn và đang xử lý.</span>" + "</div><br>"
-					+ "<div class='card'>" + "<b>Đơn Hàng Được Giao đến</b> <br>" + "<div class='row'>"
-					+ "<div class='col-md-4'>" + "Tên: " + user.getFullName() + "<br>" + "Địa Chỉ: " + addresses
-					+ "<br>" + "Điện Thoại: " + user.getPhone() + "<br>" + "Email: " + user.getEmail() + "<br>"
-					+ "</div>" + "</div>" + "</div><br>" + "<div class='card'>" + "<div class='row'>"
-					+ "<div class='col-md-5'>" + "<p>Thành Tiền:</p>" + "<p>Phí Vận Chuyển:</p>" + "<p>Giảm Giá:</p>"
-					+ "<p>Tổng Cộng:</p>" + "</div>" + "<div class='col-md-3'>" + "<p>VNĐ</p>" + "<p>VNĐ</p>"
-					+ "<p>VNĐ</p>" + "<p>VNĐ</p>" + "</div>" + "<div class='col-md-3'>" + "<p>"
-					+ invoice.getTotalAmount() + "</p>" + "<p>" + shipping.getCOD() + "</p>" + "<p>"
-					+ invoice.getDiscount() + "</p>" + "<p>" + (invoice.getTotalAmount() + shipping.getCOD() - 0)
-					+ " VNĐ</p>" + "</div>" + "</div>" + "</div>" + "<p>Cảm ơn bạn đã mua hàng!</p>"
-					+ "<p>Thông tin đơn hàng đã được gửi vào email này.</p>"
-					+ "<p>Trân trọng,<br />Đội ngũ hỗ trợ của chúng tôi</p>"
-					+ "<p>*Vui lòng không trả lời email này!*</p>" + "</div>" + "</div>" + "</div>" + "</body>"
-					+ "</html>";
 
-			mimeMessageHelper.setText(htmlContent, true);
-			sender.send(mimeMessage);
-			System.out.println("Email đã được gửi đi thành công.");
-		} catch (Exception e) {
-			System.out.println("Đã xảy ra lỗi khi gửi email: " + e.getMessage());
-			e.printStackTrace();
-			// Bạn có thể thêm logic xử lý lỗi ở đây nếu cần
-		}
 		return "/client/PaySuccess";
 	}
-
+	
 	private void saveInvoiceItems(HttpSession session, Invoice invoice) {
 		// Chuyển đổi các mục giỏ hàng thành các mục hóa đơn
 		List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
@@ -304,7 +312,7 @@ public class Client_PayController {
 			}
 		}
 	}
-
+//vnpay
 	@GetMapping("/response")
 	public String handleVNPayResponse(@RequestParam Map<String, String> params, HttpSession session,
 			HttpServletRequest request, Model model) {
@@ -331,14 +339,14 @@ public class Client_PayController {
 				}
 				model.addAttribute("orderId", invoice.getInvoiceId());
 				model.addAttribute("totalAmount", invoice.getTotalAmount());
-				model.addAttribute("paymentMethod", invoice.getPaymentMethod().getPaymentMethodName());
+				model.addAttribute("payment_method_id", invoice.getPaymentMethod().getPaymentMethodName());
 				model.addAttribute("orderTime", invoice.getPaymentDate());
 				// Handle successful payment
 				return "/client/PaySuccess";
 			} else {
 				// Handle failed payment
-				model.addAttribute("errorCode", vnpResponseCode);
-				model.addAttribute("errorMessage", "Thanh toán không thành công, mã lỗi: " + vnpResponseCode);
+//				model.addAttribute("errorCode", vnpResponseCode);
+				model.addAttribute("errorMessage", "Thanh toán không thành công do đã hủy thanh toán!!");
 				return "/client/PaymentFailed";
 			}
 		} else {
@@ -349,18 +357,30 @@ public class Client_PayController {
 		}
 	}
 
-//	@RequestMapping("/products/details/cart/pay/success") 
-//	public String orderView(Model model) {
-//		Invoice invoice = (Invoice) sessionService.get("invoice");
-//        if (invoice == null) {
-//            return "redirect:/error"; // Chuyển hướng đến trang lỗi nếu không tìm thấy hóa đơn
-//        }
-//        model.addAttribute("orderId", invoice.getInvoiceId());
-//        model.addAttribute("totalAmount", invoice.getTotalAmount());
-//        model.addAttribute("paymentMethod", invoice.getPaymentMethod().getPaymentMethodName());
-//        model.addAttribute("orderTime", invoice.getPaymentDate());
-//        return "client/PaySuccess";
-//	}
+	//payos
+	@RequestMapping("/success")
+	public String handlePaymentSuccess(HttpServletRequest request, HttpServletResponse response,HttpSession session,Model model) {
+		// Lấy hóa đơn và các mục giỏ hàng từ session
+		Invoice invoice = (Invoice) session.getAttribute("invoice");
+		if (invoice != null) {
+			invoiceRepository.saveAndFlush(invoice);
+			saveInvoiceItems(session, invoice);
+			sessionService.remove("cartItems");
+			session.removeAttribute("invoice");
+		}
+		model.addAttribute("orderId", invoice.getInvoiceId());
+		model.addAttribute("totalAmount", invoice.getTotalAmount());
+		model.addAttribute("paymentMethod", invoice.getPaymentMethod().getPaymentMethodName());
+		model.addAttribute("orderTime", invoice.getPaymentDate());
+		return "/client/PaySuccess";
+	}
+
+	@RequestMapping("/cancel")
+	public String handlePaymentCancel(HttpServletRequest request,Model model) {
+		model.addAttribute("errorMessage", "Đã hủy thanh toán!!");
+	    // Xử lý khi thanh toán bị hủy
+	    return "/client/PaymentFailed"; // Trang thông báo hủy
+	}
 
 	@PostMapping("/apply-discount")
 	public ResponseEntity<Map<String, Object>> applyDiscount(@RequestBody Map<String, String> payload) {
