@@ -1,7 +1,7 @@
 package com.poly.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,24 +14,22 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.poly.model.CartItem;
 import com.poly.model.Category;
-import com.poly.model.Image;
+import com.poly.model.Invoice;
 import com.poly.model.Product;
-import com.poly.model.ShoppingCart;
 import com.poly.repository.CartItemRepository;
 import com.poly.repository.CategoryRepository;
 import com.poly.repository.ImageRepository;
 import com.poly.repository.ProductRepository;
 import com.poly.repository.ShoppingCartRepository;
 import com.poly.service.CategoryService;
+import com.poly.service.InvoiceService;
 import com.poly.service.ProductService;
 
 @Controller
@@ -45,6 +43,9 @@ public class Client_HomeController {
 	ImageRepository imageRepository;
 
 	@Autowired
+	private InvoiceService invoiceService;
+
+	@Autowired
 	CartItemRepository cartItemRepository;
 
 	@Autowired
@@ -56,28 +57,56 @@ public class Client_HomeController {
 	@Autowired
 	CategoryService categoryService;
 
+// <<<<<<< duy
+// =======
+// //	@GetMapping("/index")
+// //	public String home(Model model) {
+// //		List<Product> products = productService.getAllProducts();
+// //		model.addAttribute("products", products);
+// //		List<Category> categories = categoryService.getAllCategory();
+// //		model.addAttribute("categories", categories);
+// //		return "indexClient";
+// //	}
+	
+// >>>>>>> update_Code
 	@GetMapping("/index")
 	public String home(Model model) {
-		List<Product> products = productService.getAllProducts();
-		model.addAttribute("products", products);
-		List<Category> categories = categoryService.getAllCategory();
-		model.addAttribute("categories", categories);
-		return "indexClient";
-	}
+		List<Product> products = productService.getAllProducts(); // Lấy tất cả sản phẩm
+		model.addAttribute("products", products); // Thêm danh sách sản phẩm vào mô hình
 
-	@GetMapping("/filter/{categoryId}")
-	public String locThieuThuyet(Model model, @PathVariable("categoryId") Integer categoryId) {
-		List<Product> products = productService.getProductsByCategoryId(categoryId);
-		model.addAttribute("products", products);
-		return "client/Product";
+		// Tạo danh sách để phân loại sản phẩm hiện tại và sản phẩm sắp bán
+		List<Product> currentProducts = new ArrayList<>(); // Danh sách sản phẩm hiện tại
+		List<Product> upcomingProducts = new ArrayList<>(); // Danh sách sản phẩm sắp bán
+		Date currentDate = new Date(); // Lấy ngày hiện tại
+
+		// Duyệt qua từng sản phẩm để phân loại
+		for (Product product : products) {
+			// Kiểm tra nếu ngày đăng nhỏ hơn ngày hiện tại
+			if (product.getPostingDate().before(currentDate)) {
+				currentProducts.add(product); // Sản phẩm có sẵn
+			} else {
+				upcomingProducts.add(product); // Sản phẩm sắp bán
+			}
+		}
+
+		// Thêm cả hai danh sách vào mô hình để có thể sử dụng trong view
+		model.addAttribute("currentProducts", currentProducts);
+		model.addAttribute("upcomingProducts", upcomingProducts);
+		// Chỉ lấy danh mục loại sàn phẩm ở trạng thấy On
+		List<Category> categories = categoryRepository.findAllCategoriesStatusId1();
+		model.addAttribute("categories", categories); // Thêm danh sách danh mục vào mô hình
+
+		return "indexClient"; // Trả về view indexClient
 	}
 
 	@GetMapping("/products")
+// <<<<<<< khagdn
 	public String products(Model model, @RequestParam(name = "keyName", required = false) String keyName,
 			@RequestParam("pageNo") Optional<Integer> pageNo,
-			@RequestParam(name = "categoryId", required = false) Integer categoryId) {
+			@RequestParam(name = "categoryId", required = false) Integer categoryId,
+			@RequestParam(name = "productId", required = false) Integer productId) {
 
-		Sort sort = Sort.by(Direction.DESC, "productId");
+		Sort sort = Sort.by(Sort.Direction.DESC, "productId");
 		Pageable pageable = PageRequest.of(pageNo.orElse(0), 10, sort);
 
 		Page<Product> page;
@@ -95,25 +124,84 @@ public class Client_HomeController {
 		}
 
 		List<Product> products = page.getContent();
-		List<Category> categories = categoryRepository.findAll(Sort.by(Direction.DESC, "categoryId"));
+		List<Category> categories = categoryRepository.findAll(Sort.by(Sort.Direction.DESC, "categoryId"));
+
+		// Tính toán giá giảm giá cho từng sản phẩm
+		List<Double> discountedPrices = new ArrayList<>();
+		for (Product product : products) {
+			double discountedPrice = product.getPrice()
+					- ((product.getPrice() * product.getDiscountPercentage()) / 100);
+			discountedPrices.add(discountedPrice);
+		}
 
 		model.addAttribute("categories", categories);
 		model.addAttribute("totalPageProduct", totalPages);
 		model.addAttribute("pageProduct", page);
 		model.addAttribute("pageClick", pageNo.orElse(0));
 		model.addAttribute("products", products);
+		model.addAttribute("discountedPrices", discountedPrices);
 		model.addAttribute("selectedCategoryId", categoryId);
 
 		return "client/Product";
 	}
+// =======
+	public String products(Model model, 
+	                       @RequestParam(name = "keyName", required = false) String keyName,
+	                       @RequestParam("pageNo") Optional<Integer> pageNo,
+	                       @RequestParam(name = "categoryId", required = false) Integer categoryId) {
+
+	    int pageSize = 6; // Số sản phẩm trên mỗi trang
+	    Sort sort = Sort.by(Sort.Direction.DESC, "productId");
+	    Pageable pageable = PageRequest.of(pageNo.orElse(0), pageSize, sort);
+
+	    Page<Product> page;
+	    if (StringUtils.hasText(keyName)) {
+	        page = productRepository.findByProductNameContaining(keyName, pageable);
+	    } else if (categoryId != null) {
+	        page = productRepository.findProductsByCategory(categoryId, pageable);
+	    } else {
+	        page = productRepository.findAll(pageable);
+	    }
+
+	    int totalPages = page.getTotalPages(); // Tổng số trang
+	    int currentPage = pageNo.orElse(0); // Trang hiện tại
+
+	    List<Product> products = page.getContent();
+	    List<Category> categories = categoryRepository.findAll(Sort.by(Sort.Direction.DESC, "categoryId"));
+
+	    List<Double> discountedPrices = new ArrayList<>();
+	    for (Product product : products) {
+	        double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
+	        discountedPrices.add(discountedPrice);
+	    }
+	    
+	    if (products.isEmpty()) {
+	        model.addAttribute("noProductsFound", true);
+	    } else {
+	        model.addAttribute("products", products);
+	    }
+
+	    model.addAttribute("categories", categories);
+	    model.addAttribute("totalPageProduct", totalPages);
+	    model.addAttribute("pageProduct", page);
+	    model.addAttribute("pageClick", currentPage);
+	    model.addAttribute("products", products);
+	    model.addAttribute("discountedPrices", discountedPrices);
+	    model.addAttribute("selectedCategoryId", categoryId);
+
+	    return "client/Product";
+	}
+	
+// >>>>>>> update_Code
 
 	@PostMapping("/products")
 	public String priceProducts(Model model, @RequestParam("pageNo") Optional<Integer> pageNo,
 			@RequestParam(name = "categoryId", required = false) Integer categoryId,
+			@RequestParam(name = "productId", required = false) Integer productId,
 			@RequestParam("price_range") Optional<String> priceRange) {
 
 		Sort sort = Sort.by(Direction.DESC, "productId");
-		Pageable pageable = PageRequest.of(pageNo.orElse(0), 10, sort);
+		Pageable pageable = PageRequest.of(pageNo.orElse(0), 6, sort);
 
 		Page<Product> page;
 		if (priceRange.isPresent()) {
@@ -135,43 +223,124 @@ public class Client_HomeController {
 
 		List<Product> products = page.getContent();
 		List<Category> categories = categoryRepository.findAll(Sort.by(Direction.DESC, "categoryId"));
+		
+		List<Double> discountedPrices = new ArrayList<>();
+	    for (Product product : products) {
+	        double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
+	        discountedPrices.add(discountedPrice);
+	    }
+	    
+	    if (products.isEmpty()) {
+	        model.addAttribute("noProductsFound", true);
+	    } else {
+	        model.addAttribute("products", products);
+	    }
 
 		model.addAttribute("categories", categories);
 		model.addAttribute("totalPageProduct", totalPages);
 		model.addAttribute("pageProduct", page);
 		model.addAttribute("pageClick", pageNo.orElse(0));
 		model.addAttribute("products", products);
+		model.addAttribute("discountedPrices", discountedPrices);
 		model.addAttribute("selectedCategoryId", categoryId);
 
 		return "client/Product";
 	}
+// <<<<<<< khagdn
 
+// 	@GetMapping("/products/details/{productId}")
+// 	public String productDetails(Model model, @PathVariable("productId") Integer productId,
+// 			@RequestParam("pageNo") Optional<Integer> pageNo) {
+// =======
+	
+	
 	@GetMapping("/products/details/{productId}")
 	public String productDetails(Model model, @PathVariable("productId") Integer productId,
-			@RequestParam("pageNo") Optional<Integer> pageNo) {
+	                             @RequestParam("pageNo") Optional<Integer> pageNo) {
 
-		Sort sort = Sort.by(Direction.DESC, "productId");
-		Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
-		Page<Product> page = productRepository.findAll(pageable);
+	    try {
+	        // Lấy sản phẩm chi tiết
+	        Product product = productRepository.findById(productId)
+	                .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
+	        model.addAttribute("product", product);
 
-		List<Integer> totalPages = new ArrayList<Integer>();
-		for (int i = 0; i < page.getTotalPages(); i++) {
-			totalPages.add(i + 1);
+	        // Tính giá sau khi giảm
+	       
+	            double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
+	            model.addAttribute("discountedPrice", discountedPrice);
+	                   
+
+	        // Phân trang danh sách sản phẩm
+	        Sort sort = Sort.by(Sort.Direction.DESC, "productId");
+	        Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
+	        Page<Product> page = productRepository.findAll(pageable);
+
+	        List<Integer> totalPages = new ArrayList<>();
+	        for (int i = 0; i < page.getTotalPages(); i++) {
+	            totalPages.add(i + 1);
+	        }
+
+	        List<Product> products = page.getContent();
+	        
+	        List<Double> discountedPrices = new ArrayList<>();
+		    for (Product productss : products) {
+		        double discountedPrice1 = productss.getPrice() - ((productss.getPrice() * productss.getDiscountPercentage()) / 100);
+		        discountedPrices.add(discountedPrice1);
+		    }
+
+
+	        model.addAttribute("totalPageProduct", totalPages);
+	        model.addAttribute("pageProduct", page);
+	        model.addAttribute("pageClick", pageNo.orElse(0));
+	        model.addAttribute("products", products);
+	        model.addAttribute("discountedPrices", discountedPrices);
+
+	        return "client/ProductDetails";
+	        
+	    } catch (Exception e) {
+	        // Ghi log lỗi
+	        e.printStackTrace();
+	        return "error"; // Trả về trang lỗi nếu xảy ra ngoại lệ
+	    }
+	}
+//>>>>>>> update_Code
+
+		try {
+			// Lấy sản phẩm chi tiết
+			Product product = productRepository.findById(productId)
+					.orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
+			model.addAttribute("product", product);
+
+			// Tính giá sau khi giảm
+
+			double discountedPrice = product.getPrice()
+					- ((product.getPrice() * product.getDiscountPercentage()) / 100);
+			model.addAttribute("discountedPrice", discountedPrice);
+
+			// Phân trang danh sách sản phẩm
+			Sort sort = Sort.by(Sort.Direction.DESC, "productId");
+			Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
+			Page<Product> page = productRepository.findAll(pageable);
+
+			List<Integer> totalPages = new ArrayList<>();
+			for (int i = 0; i < page.getTotalPages(); i++) {
+				totalPages.add(i + 1);
+			}
+
+			List<Product> products = page.getContent();
+
+			model.addAttribute("totalPageProduct", totalPages);
+			model.addAttribute("pageProduct", page);
+			model.addAttribute("pageClick", pageNo.orElse(0));
+			model.addAttribute("products", products);
+
+			return "client/ProductDetails";
+
+		} catch (Exception e) {
+			// Ghi log lỗi
+			e.printStackTrace();
+			return "error"; // Trả về trang lỗi nếu xảy ra ngoại lệ
 		}
-
-		List<Product> products = page.getContent();
-
-		model.addAttribute("totalPageProduct", totalPages);
-		model.addAttribute("pageProduct", page);
-		model.addAttribute("pageClick", pageNo.orElse(0));
-
-		Product product = productRepository.findById(productId).get();
-		model.addAttribute("product", product);
-
-		model.addAttribute("products", products);
-
-		return "client/ProductDetails";
-
 	}
 
 //	@GetMapping("products/details/cart")
@@ -193,9 +362,17 @@ public class Client_HomeController {
 		return "client/About";
 	}
 
-	@GetMapping("/Contact")
+	@GetMapping("/contact")
 	public String Contact() {
 		return "client/Contact";
+	}
+
+	@GetMapping("/history")
+	public String History(Model model) {
+	    List<Invoice> invoices = invoiceService.getAllInvoices();
+	    invoices.sort((i1, i2) -> i2.getInvoiceId().compareTo(i1.getInvoiceId()));
+	    model.addAttribute("invoices", invoices);
+	    return "client/History";
 	}
 
 }

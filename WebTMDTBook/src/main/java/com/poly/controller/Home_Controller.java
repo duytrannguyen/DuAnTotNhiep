@@ -3,6 +3,7 @@ package com.poly.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +29,7 @@ public class Home_Controller {
 
 	@Autowired
 	private UserService userService;
-	@Autowired
-	UserServiceImpl userServiceImpl;
+
 	@Autowired
 	private SessionService sessionService;
 
@@ -38,43 +38,72 @@ public class Home_Controller {
 
 	@Autowired
 	private InvoiceService invoiceService;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-	@GetMapping("/login")
+	@Autowired
+	private UserService userServiceImpl;
+
+	@RequestMapping("/login")
 	public String Login() {
 		return "login/logintest";
 	}
 
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginDTO loginDTO, Model model, HttpSession session) {
-	    // Call userServiceImpl.login to check login credentials
+	    // Call userServiceImpl.login to check login information
 	    boolean result = userServiceImpl.login(loginDTO);
 
 	    if (result) {
-	        // Retrieve user details from the database or wherever user information is stored
+	        // Retrieve user information from the database
 	        User user = userServiceImpl.getUserByUsername(loginDTO.getUsername());
 
 	        if (user != null) {
-	            // Store user object in session
-	            session.setAttribute("user", user);
-
-	            if (user.getRoleId().getRoleId() == 1) {
-	                // Redirect to admin page if user is admin
-	                return "redirect:/admin/products/list";
-	            } else {
-	                // Redirect to home page for non-admin users
-	                return "redirect:/home/index";
+	            // Check the user's status
+	            switch (user.getStatusId().getStatusId()) {
+	                case 1: // Active
+	                    // Store user object in session
+	                    session.setAttribute("user", user);
+	                    model.addAttribute("successMessage", "Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
+	                    
+	                    // Redirect to the appropriate page based on the user role
+	                    if (user.getRoleId().getRoleId() == 1) {
+	                        // Redirect to admin page if the user is admin
+	                        return "redirect:/admin/index";
+	                    } else {
+	                        // Redirect to home page for regular users
+	                        return "redirect:/home/index";
+	                    }
+	                case 2: // Inactive
+	                    model.addAttribute("errorMessage", "Tài khoản của bạn không hoạt động.");
+	                    break;
+	                case 3: // Pending
+	                    model.addAttribute("errorMessage", "Tài khoản của bạn đang chờ xử lý.");
+	                    break;
+	                case 4: // Suspended
+	                    model.addAttribute("errorMessage", "Tài khoản của bạn đã bị tạm đình chỉ.");
+	                    break;
+	                case 5: // Banned
+	                    model.addAttribute("errorMessage", "Tài khoản của bạn đã bị cấm vĩnh viễn.");
+	                    break;
+	                default:
+	                    model.addAttribute("errorMessage", "Trạng thái tài khoản không xác định.");
+	                    break;
 	            }
 	        } else {
-	            // User not found (this scenario should ideally not happen if login was successful)
-	            model.addAttribute("mess", "User not found");
-	            return "/login/logintest";
+	            // User not found (should not occur if login is successful)
+	            model.addAttribute("errorMessage", "Người dùng không được tìm thấy.");
 	        }
 	    } else {
-	        // Invalid credentials
-	        model.addAttribute("mess", "Invalid credentials");
-	        return "/login/logintest";
+	        // Invalid login information
+	        model.addAttribute("errorMessage", "Thông tin đăng nhập không hợp lệ.");
 	    }
+
+	    // Return to the login page with an error message if login fails
+	    return "/login/logintest";
 	}
+
+
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 		session.invalidate();

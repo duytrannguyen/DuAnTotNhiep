@@ -32,7 +32,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "Users", schema = "dbo", catalog = "DUANTN")
+@Table(name = "Users")
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,5 +80,7 @@ public class User {
 	public String toString() {
 		return "User{address=" + addresses + "}";
 	}
+	@OneToMany(mappedBy = "user")
+    private List<DiscountDetail> DiscountDetail;
 
 }

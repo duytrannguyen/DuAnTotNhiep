@@ -41,10 +41,10 @@ figure, header, nav, section, article, aside, footer, figcaption {
   border: 0;
   outline: 0;
 }
-span{
+/* span{ */
 	
-	color: white;
-}
+/* 	color: white; */
+/* } */
 .clearfix:after {
   content: ".";
   display: block;

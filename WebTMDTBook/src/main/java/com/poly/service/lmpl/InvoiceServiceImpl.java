@@ -1,4 +1,5 @@
 package com.poly.service.lmpl;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 	@Autowired
 	private InvoiceRepository invoiceRepository;
 
-	@Override
-	public List<Invoice> getAllInvoices() {
-		return invoiceRepository.findAllInvoicesWithDetails();
-	}
+//	@Override
+//	public List<Invoice> getAllInvoices() {
+//		return invoiceRepository.findAllInvoicesWithDetails();
+//	}
 
 	@Override
 	public Double getTotalAmount() {
@@ -29,32 +30,45 @@ public class InvoiceServiceImpl implements InvoiceService {
 		return invoiceRepository.countTotalOrders();
 	}
 
+//	@Override
+//	public List<Invoice> searchInvoices(String searchQuery) {
+//		Integer invoiceId = null;
+//		try {
+//			invoiceId = Integer.parseInt(searchQuery);
+//		} catch (NumberFormatException e) {
+//			// Do nothing, invoiceId will be null
+//		}
+//		return invoiceRepository.findByInvoiceIdOrCartUserFullNameContaining(invoiceId, searchQuery);
+//	}
+
+	// Khang
 	@Override
-	public List<Invoice> searchInvoices(String searchQuery) {
-		Integer invoiceId = null;
-		try {
-			invoiceId = Integer.parseInt(searchQuery);
-		} catch (NumberFormatException e) {
-			// Do nothing, invoiceId will be null
-		}
-		return invoiceRepository.findByInvoiceIdOrCartUserFullNameContaining(invoiceId, searchQuery);
+	public Invoice findByInvoice(Integer invoiceId) {
+		return invoiceRepository.findById(invoiceId).orElse(null);
 	}
 
-	//Khang
-	@Override
-	public Invoice findById(Integer id) {
-		return invoiceRepository.findById(id).orElse(null);
-	}
-
-	//Khang
+	// Khang
 	@Override
 	public List<Invoice> findByStatusName(String statusName) {
 		return invoiceRepository.findByStatusStatusName(statusName);
 	}
 
-	//Khang
+	// Khang
 	@Override
 	public void save(Invoice invoice) {
 		invoiceRepository.save(invoice);
 	}
+
+//ly
+	@Override
+	public List<Invoice> searchInvoices(String searchQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Invoice> getAllInvoices() {
+		return invoiceRepository.findAllInvoicesWithDetails();
+	}
+
 }

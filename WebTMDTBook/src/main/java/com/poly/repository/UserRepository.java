@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.poly.model.Image;
 import com.poly.model.User;
@@ -16,8 +17,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
 //cái này cho đổi mật khẩu luôn
 	User findByUsername(String username);
-
-//	Optional<User> findByUsernamePass(String username);
+	
+	@Query("SELECT u FROM User u WHERE u.username = :username")
+    Optional<User> findByUsernameApi(String username);
+//	Optional<User> findByUsernameApi(String username);
 
 	@Query("SELECT u FROM User u WHERE u.roleId.roleId = 2")
 	List<User> findAllUsersWithUserRole();

@@ -1,6 +1,7 @@
 package com.poly.model;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -41,8 +43,8 @@ public class Invoice {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date paymentDate;
 
-	@Column(nullable = false)
-	private String paymentStatus;
+//	@Column(nullable = false)
+//	private String paymentStatus;
 
 	@ManyToOne
 	@JoinColumn(name = "users_id", nullable = false)
@@ -63,4 +65,7 @@ public class Invoice {
 	@ManyToOne
 	@JoinColumn(name = "discount_id", nullable = true)
 	private Discount discount;
+	
+	@OneToMany(mappedBy = "invoice")
+     List<DiscountDetail> DiscountDetail;
 }

@@ -31,21 +31,27 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "Products", schema = "dbo", catalog = "DUANTN")
+@Table(name = "Products")
 //Khang
 @ToString(exclude = "invoiceItems")
 public class Product {
-	//ly
+	// ly
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int productId;
 
 	@Column(nullable = false)
 	private String productName;
+	
+	@Column(nullable = false)
+	private float discountPercentage;
 
 	@Column(nullable = false)
 	private float price;
 
+//	@Column(nullable = false)
+//	private float discountPercentage;
+	
 	@Column(nullable = false)
 	private int publishingYear;
 
@@ -85,7 +91,19 @@ public class Product {
 	@ManyToOne
 	@JoinColumn(name = "imageId", nullable = false)
 	private Image imageId;
+//<<<<<<< duy
+
+	@ManyToOne
+	@JoinColumn(name = "statusId", nullable = false)
+	private ProductStatus status;
+
+//=======
 	
+// 	@ManyToOne
+// 	@JoinColumn(name = "statusId", nullable = false)
+// 	private ProductStatus statusId;
+	
+//>>>>>>> ly
 	@OneToMany(mappedBy = "product")
 	private List<InvoiceItem> invoiceItems;
 }
