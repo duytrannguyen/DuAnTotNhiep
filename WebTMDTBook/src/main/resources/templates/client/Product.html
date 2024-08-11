@@ -46,7 +46,6 @@ body, html {
 /* 	padding: 20px 0; */
 /* 	background: #f5f5f5; */
 /* } */
-
 .container-fluid {
 	padding: 20px;
 }
@@ -107,7 +106,7 @@ body, html {
 	<div class="page-heading normal-space">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-12" >
+				<div class="col-lg-12">
 					<h1 style="text-align: center; font-size: xx-large;">Sản phẩm</h1>
 				</div>
 			</div>
@@ -123,51 +122,41 @@ body, html {
 						<br>
 						<ul>
 							<!-- <<<<<<< duy -->
-<!-- 							<a><strong>GIÁ</strong></a> -->
+							<!-- 							<a><strong>GIÁ</strong></a> -->
 							<!-- >>>>>>> di -->
-														<strong>GIÁ</strong>
+							<strong style="padding: 20px">GIÁ</strong>
 
 							<form action="/home/products" method="post"
 								id="product-filter-form" onchange="this.submit()">
 								<ul class="list-group">
 									<li class="list-group-item"><input
-										class="form-check-input me-1 price-filter" type="checkbox"
-										value="0-50000" name="price_range" id="price0-50"> <label
-										class="form-check-label" for="price0-50">Dưới 50,000đ</label>
-									</li>
-
+										class="form-check-input me-1 price-filter" type="radio"
+										name="price_range" value="0-100000" id="price0-100"> <label
+										class="form-check-label" for="price0-100">Dưới
+											100,000đ</label></li>
 									<li class="list-group-item"><input
-										class="form-check-input me-1 price-filter" type="checkbox"
-										value="50000-150000" name="price_range" id="price50-150">
-										<label class="form-check-label" for="price50-150">50,000đ
-											- 150,000đ</label></li>
-									<li class="list-group-item"><input
-										class="form-check-input me-1 price-filter" type="checkbox"
-										value="150000-250000" name="price_range" id="price150-250">
-										<label class="form-check-label" for="price150-250">150,000đ
+										class="form-check-input me-1 price-filter" type="radio"
+										name="price_range" value="100000-200000" id="price100-250">
+										<label class="form-check-label" for="price100-250">100,000đ
 											- 250,000đ</label></li>
 									<li class="list-group-item"><input
-										class="form-check-input me-1 price-filter" type="checkbox"
-										value="250000-350000" name="price_range" id="price250-350">
-										<label class="form-check-label" for="price250-350">250,000đ
+										class="form-check-input me-1 price-filter" type="radio"
+										name="price_range" value="200000-300000" id="price200-350">
+										<label class="form-check-label" for="price200-350">200,000đ
 											- 350,000đ</label></li>
 									<li class="list-group-item"><input
-										class="form-check-input me-1 price-filter" type="checkbox"
-										value="350000-500000" name="price_range" id="price350-500">
-										<label class="form-check-label" for="price350-500">350,000đ
-											- 500,000đ</label></li>
+										class="form-check-input me-1 price-filter" type="radio"
+										name="price_range" value="350000-500000" id="price350-500">
+										<label class="form-check-label" for="pric350-500">350,000đ
+											-500,000đ</label></li>
 									<li class="list-group-item"><input
-										class="form-check-input me-1 price-filter" type="checkbox"
-										value="500000-700000" name="price_range" id="price500-700">
-										<label class="form-check-label" for="price500-700">500,000đ
-											- 700,000đ</label></li>
-									<li class="list-group-item"><input
-										class="form-check-input me-1 price-filter" type="checkbox"
-										value="700000-999999999" name="price_range" id="price700-">
-										<label class="form-check-label" for="price700-">Trên
-											700,000đ</label></li>
+										class="form-check-input me-1 price-filter" type="radio"
+										name="price_range" value="500000-999999999" id="price500-">
+										<label class="form-check-label" for="price500-">Trên
+											500,000đ</label></li>
 								</ul>
 							</form>
+
 						</ul>
 						<hr>
 						<!-- THỂ LOẠI -->
@@ -180,17 +169,14 @@ body, html {
 										<div class="form-check">
 											<input class="form-check-input" type="radio"
 												name="categoryId" id="categoryIdAll" value="0"
-												th:checked="${#lists.isEmpty(param.categoryId) or param.categoryId == 0}"
 												onchange="redirectToProductPage()"> <label
 												class="form-check-label" for="categoryIdAll">Tất cả</label>
 										</div>
-
 										<div th:each="c : ${categories}">
 											<div class="form-check">
 												<input class="form-check-input" type="radio"
-													th:value="${c.categoryId}" name="categoryId"
+													name="categoryId" th:value="${c.categoryId}"
 													th:id="'category-' + ${c.categoryId}"
-													th:checked="${param.categoryId == c.categoryId}"
 													onchange="submitFilterForm()"> <label
 													class="form-check-label"
 													th:for="'category-' + ${c.categoryId}">[[${c.categoryName}]]</label>
@@ -198,6 +184,7 @@ body, html {
 										</div>
 									</div>
 								</form>
+
 							</ul>
 							<!-- ======= di -->
 							<!-- 							<strong>THỂ LOẠI</strong>
@@ -232,25 +219,29 @@ body, html {
 					<div class="card" style="padding: 20px">
 						<div class="row">
 							<div class="col-md-5">
-<!-- 							tìm kiếm giọng nói -->
+								<!-- 							tìm kiếm giọng nói -->
 								<label class="lb"><em><b>Tìm kiếm sản phẩm</b></em></label>
-             <form class="d-flex" role="search" action="/home/products" method="get" id="searchForm">
-                <input class="form-control me-2" type="search" aria-label="Search" name="keyName" id="searchInput">
-                <button class="btn btn-outline-primary" type="submit">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-                 <button class="btn btn-outline-secondary ms-2" type="button" id="voiceButton">
-                    <i class="fa-solid fa-microphone microphone-icon" id="microphoneIcon"></i>
-                    <div class="recording-indicator" id="recordingIndicator"></div>
-                </button>
-            </form>
+								<form class="d-flex" role="search" action="/home/products"
+									method="get" id="searchForm">
+									<input class="form-control me-2" type="search"
+										aria-label="Search" name="keyName" id="searchInput">
+									<button class="btn btn-outline-primary" type="submit">
+										<i class="fa-solid fa-magnifying-glass"></i>
+									</button>
+									<button class="btn btn-outline-secondary ms-2" type="button"
+										id="voiceButton">
+										<i class="fa-solid fa-microphone microphone-icon"
+											id="microphoneIcon"></i>
+										<div class="recording-indicator" id="recordingIndicator"></div>
+									</button>
+								</form>
 							</div>
 						</div>
 						<hr>
 						<!-- DANH SÁCH SẢN PHẨM -->
 						<!-- <<<<<<< duy -->
 						<div class="row row-cols-1 g-4">
-							<h6>DANH SÁCH SẢN PHẨM</h6>
+							<!-- <!-- <h6>DANH SÁCH SẢN PHẨM</h6> -->
 							<div th:each="p : ${currentProducts}" class="col-md-3">
 								<a th:href="'products/details/' + ${p.productId}"
 									class="a-product text-decoration-none">
@@ -266,37 +257,22 @@ body, html {
 											</div>
 										</div>
 									</div>
-								</a> <br>
+								</a>
 							</div>
-							<hr>
-							<br>
-							<!-- CHUYỂN TRANG -->
-<!-- 							<div class="card-footer d-flex justify-content-center"> -->
-<!-- 								<nav aria-label="Page navigation example"> -->
-<!-- 									<ul class="pagination mb-0"> -->
-<!-- 										<li class="page-item"><a -->
-<!-- 											class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg" -->
-<!-- 											th:href="@{'?pageNo=' + (${pageClick} > 0 ? ${pageClick} - 1 : 0)}" -->
-<!-- 											aria-label="Previous"> <span aria-hidden="true">&laquo;</span> -->
-<!-- 										</a></li> -->
-<!-- 										<li th:each="pageNum : ${totalPageProduct}" class="page-item"> -->
-<!-- 											<a -->
-<!-- 											class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg" -->
-<!-- 											th:classappend="${pageClick} == ${pageNum - 1} ? 'selected' : ''" -->
-<!-- 											th:href="@{'?pageNo=' + (${pageNum - 1})}">[[${pageNum}]]</a> -->
-<!-- 										</li> -->
-<!-- 										<li class="page-item"><a -->
-<!-- 											class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg" -->
-<!-- 											th:href="@{'?pageNo=' + (${pageClick} < ${totalPageProduct.size()} - 1 ? ${pageClick} + 1 : ${totalPageProduct.size()} - 1)}" -->
-<!-- 											aria-label="Next"> <span aria-hidden="true">&raquo;</span> -->
-<!-- 										</a></li> -->
-<!-- 									</ul> -->
-<!-- 								</nav> -->
-<!-- 							</div> -->
 						</div>
-<!-- 						======= di -->
-												<h6>DANH SÁCH SẢN PHẨM</h6>
+						<br>
+
+
+						<!-- 						======= di -->
+
+						<h6>DANH SÁCH SẢN PHẨM</h6>
+						<br>
 						<div class="row row-cols-1 row-cols-md-4 g-4">
+							<div th:if="${noProductsFound}">
+								<div colspan="7"><label class="text-danger"> <b>Không tìm
+										thấy sản phẩm.</b></label></div>
+							</div>
+
 							<div th:each="p, iterStat : ${products}">
 								<div class="col">
 									<a th:href="@{/home/products/details/{id}(id=${p.productId})}"
@@ -330,115 +306,148 @@ body, html {
 
 							</div>
 						</div>
-						
+
 						<br>
 						<!-- PHÂN TRANG -->
-											<div class="card-footer d-flex justify-content-center">
+						<div class="card-footer d-flex justify-content-center">
 							<nav aria-label="Page navigation example">
 								<ul class="pagination mb-0">
+									<!-- Nút Đầu -->
 									<li class="page-item"><a
 										class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg"
-										th:href="@{/home/products(pageNo=${pageClick > 0} ? ${pageClick - 1} : 0)}"
-										aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-									<li class="page-item"
-										th:each="pageNum : ${#numbers.sequence(1, totalPageProduct)}">
+										th:href="@{/home/products(pageNo=0)}" aria-label="Previous">
+											<span aria-hidden="true">&laquo;</span>
+									</a></li>
+
+									<!-- Số Trang -->
+									<li
+										th:each="pageNum, stat : ${#numbers.sequence(1, totalPageProduct)}"
+										class="page-item"
+										th:classappend="${pageClick == stat.index} ? 'active' : ''">
 										<a
 										class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg"
-										th:classappend="${pageClick == pageNum - 1} ? 'selected' : ''"
-										th:href="@{/home/products(pageNo=${pageNum - 1})}"><span
-											th:text="${pageNum}"></span></a>
+										th:href="@{/home/products(pageNo=${stat.index})}"> <span
+											th:text="${pageNum}"></span>
+									</a>
 									</li>
 
+									<!-- Nút Cuối -->
+									<li class="page-item"><a
+										class="page-link bg-black bg-gradient text-info hover-bg-primary hover-color-white btn-lg"
+										th:href="@{/home/products(pageNo=${pageProduct.totalPages - 1})}"
+										aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+									</a></li>
 								</ul>
 							</nav>
-						</div> 
+						</div>
+
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<div th:insert="~{client_layout/footer :: footer}"></div>
+		<div th:insert="~{client_layout/footer :: footer}"></div>
 
-	<script>
-        // của thể loại
-        const showMoreBtn = document.getElementById('showMoreBtn');
-        const showLessBtn = document.getElementById('showLessBtn');
-        const extraList = document.getElementById('extraList');
-        const priceFilters = document.querySelectorAll('.price-filter');
+		<script>
+		
+		// Khi người dùng thay đổi radio button, lưu trạng thái vào sessionStorage
+		document.querySelectorAll('input[name="price_range"]').forEach((radio) => {
+		    radio.addEventListener('change', () => {
+		        sessionStorage.setItem('selectedPriceRange', radio.value);
+		    });
+		});
 
-        // Lưu trạng thái của checkbox
-        function saveCheckboxState() {
-            const checkboxes = document.querySelectorAll('.price-filter');
-            const checkedValue = Array.from(checkboxes).find(checkbox => checkbox.checked)?.value;
-            localStorage.setItem('checkedPriceRange', checkedValue);
+		// Khi trang được tải, khôi phục trạng thái radio button
+		document.addEventListener('DOMContentLoaded', () => {
+		    const savedValue = sessionStorage.getItem('selectedPriceRange');
+		    if (savedValue) {
+		        const radio = document.querySelector(`input[name="price_range"][value="${savedValue}"]`);
+		        if (radio) {
+		            radio.checked = true;
+		        }
+		    }
+		});
+
+
+	    
+    // Lưu trạng thái của radio button vào localStorage
+    function saveRadioState() {
+        const checkedRadio = document.querySelector('input[name="categoryId"]:checked');
+        if (checkedRadio) {
+            localStorage.setItem('selectedCategoryId', checkedRadio.value);
         }
+    }
 
-        // Khôi phục trạng thái của checkbox
-        function restoreCheckboxState() {
-            const checkedValue = localStorage.getItem('checkedPriceRange');
-            if (checkedValue) {
-                const checkboxes = document.querySelectorAll('.price-filter');
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = checkbox.value === checkedValue;
-                });
+    // Khôi phục trạng thái radio button từ localStorage
+    function restoreRadioState() {
+        const selectedValue = localStorage.getItem('selectedCategoryId');
+        if (selectedValue) {
+            const radioToCheck = document.querySelector(`input[name="categoryId"][value="${selectedValue}"]`);
+            if (radioToCheck) {
+                radioToCheck.checked = true;
             }
         }
+    }
 
-        // Thêm sự kiện click cho các checkbox
-        const priceFilterCheckboxes = document.querySelectorAll('.price-filter');
-        priceFilterCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('click', () => {
-                // Tắt tất cả các checkbox khác
-                priceFilterCheckboxes.forEach(otherCheckbox => {
-                    if (otherCheckbox !== checkbox) {
-                        otherCheckbox.checked = false;
-                    }
-                });
-                saveCheckboxState();
-            });
-        });
+    // Gọi hàm khôi phục trạng thái khi trang được tải
+    document.addEventListener('DOMContentLoaded', restoreRadioState);
 
-        // Khôi phục trạng thái khi trang được tải
-        restoreCheckboxState();
+    // Thực hiện khi form thay đổi
+    function submitFilterForm() {
+        saveRadioState(); // Lưu trạng thái trước khi gửi form
+        document.getElementById('filter-form').submit();
+    }
 
-        // Gọi các hàm này khi cần thiết
-        document.addEventListener('DOMContentLoaded', restoreCheckboxState);
-        document.querySelectorAll('.price-filter').forEach(checkbox => {
-            checkbox.addEventListener('change', saveCheckboxState);
-        });
-
-        showMoreBtn.addEventListener('click', () => {
-            extraList.classList.remove('d-none');
-            showMoreBtn.classList.add('d-none');
-            showLessBtn.classList.remove('d-none');
-        });
-
-        showLessBtn.addEventListener('click', () => {
-            extraList.classList.add('d-none');
-            showMoreBtn.classList.remove('d-none');
-            showLessBtn.classList.add('d-none');
-        });
-
-        function submitFilterForm() {
-            document.getElementById('filter-form').submit();
+    // Chuyển hướng để hiển thị tất cả sản phẩm
+    function redirectToProductPage() {
+        const categoryIdAll = document.getElementById('categoryIdAll');
+        if (categoryIdAll.checked) {
+            localStorage.setItem('selectedCategoryId', categoryIdAll.value); // Lưu trạng thái
+            window.location.href = "/home/products"; // Chuyển hướng để hiển thị tất cả sản phẩm
         }
+    }
 
-        function redirectToProductPage() {
-            window.location.href = "/home/products";
-        }
-    </script>
-	<!-- Bootstrap core JavaScript -->
-	<script src="/vendor/jquery/jquery.min.js"></script>
-	<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    // Hiển thị hoặc ẩn danh sách thêm
+    const showMoreBtn = document.getElementById('showMoreBtn');
+    const showLessBtn = document.getElementById('showLessBtn');
+    const extraList = document.getElementById('extraList');
 
-	<script src="/assets/js/isotope.min.js"></script>
-	<script src="/assets/js/owl-carousel.js"></script>
-	<script src="/assets/js/tabs.js"></script>
-	<script src="/assets/js/popup.js"></script>
-	<script src="/assets/js/custom.js"></script>
-	
-	<script type="text/javascript">
+    showMoreBtn.addEventListener('click', () => {
+        extraList.classList.remove('d-none');
+        showMoreBtn.classList.add('d-none');
+        showLessBtn.classList.remove('d-none');
+    });
+
+    showLessBtn.addEventListener('click', () => {
+        extraList.classList.add('d-none');
+        showMoreBtn.classList.remove('d-none');
+        showLessBtn.classList.add('d-none');
+    });
+
+    // Gọi redirectToProductPage khi chọn radio "Tất cả"
+    document.getElementById('categoryIdAll').addEventListener('change', redirectToProductPage);
+
+    // Gọi submitFilterForm khi chọn các radio khác
+    document.querySelectorAll('input[name="categoryId"]').forEach(radio => {
+        radio.addEventListener('change', submitFilterForm);
+    });
+    
+    
+</script>
+
+
+
+		<!-- Bootstrap core JavaScript -->
+		<script src="/vendor/jquery/jquery.min.js"></script>
+		<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+		<script src="/assets/js/isotope.min.js"></script>
+		<script src="/assets/js/owl-carousel.js"></script>
+		<script src="/assets/js/tabs.js"></script>
+		<script src="/assets/js/popup.js"></script>
+		<script src="/assets/js/custom.js"></script>
+
+		<script type="text/javascript">
 	//search voice
     // Check if browser supports Speech Recognition
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;

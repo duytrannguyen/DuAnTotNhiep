@@ -80,5 +80,7 @@ public class User {
 	public String toString() {
 		return "User{address=" + addresses + "}";
 	}
+	@OneToMany(mappedBy = "user")
+    private List<DiscountDetail> DiscountDetail;
 
 }
