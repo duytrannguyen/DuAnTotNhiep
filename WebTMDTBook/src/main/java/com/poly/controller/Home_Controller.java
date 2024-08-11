@@ -3,6 +3,7 @@ package com.poly.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +29,7 @@ public class Home_Controller {
 
 	@Autowired
 	private UserService userService;
-	@Autowired
-	UserServiceImpl userServiceImpl;
+
 	@Autowired
 	private SessionService sessionService;
 
@@ -38,64 +38,71 @@ public class Home_Controller {
 
 	@Autowired
 	private InvoiceService invoiceService;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-	@GetMapping("/login")
+	@Autowired
+	private UserService userServiceImpl;
+
+	@RequestMapping("/login")
 	public String Login() {
 		return "login/logintest";
 	}
 
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginDTO loginDTO, Model model, HttpSession session) {
-	    // Gọi userServiceImpl.login để kiểm tra thông tin đăng nhập
+	    // Call userServiceImpl.login to check login information
 	    boolean result = userServiceImpl.login(loginDTO);
 
 	    if (result) {
-	        // Lấy thông tin người dùng từ cơ sở dữ liệu
+	        // Retrieve user information from the database
 	        User user = userServiceImpl.getUserByUsername(loginDTO.getUsername());
 
 	        if (user != null) {
-	            // Kiểm tra trạng thái của người dùng
-	            if (user.getStatusId().getStatusId() == 1) { // Hoạt động
-	                // Lưu đối tượng người dùng vào session
-	                session.setAttribute("user", user);
-
-	                if (user.getRoleId().getRoleId() == 1) {
-	                    // Chuyển hướng đến trang quản trị nếu người dùng là admin
+	            // Check the user's status
+	            switch (user.getStatusId().getStatusId()) {
+	                case 1: // Active
+	                    // Store user object in session
+	                    session.setAttribute("user", user);
 	                    model.addAttribute("successMessage", "Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
-	                    return "redirect:/admin/products/list";
-	                } else {
-	                    // Chuyển hướng đến trang chính cho người dùng không phải admin
-	                    model.addAttribute("successMessage", "Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
-	                    return "redirect:/home/index";
-	                }
-	            } else if (user.getStatusId().getStatusId() == 2) { // Không hoạt động
-	                model.addAttribute("errorMessage", "Tài khoản của bạn không hoạt động.");
-	                return "/login/logintest";
-	            } else if (user.getStatusId().getStatusId() == 3) { // Chờ xử lý
-	                model.addAttribute("errorMessage", "Tài khoản của bạn đang chờ xử lý.");
-	                return "/login/logintest";
-	            } else if (user.getStatusId().getStatusId() == 4) { // Tạm đình chỉ
-	                model.addAttribute("errorMessage", "Tài khoản của bạn đã bị tạm đình chỉ.");
-	                return "/login/logintest";
-	            } else if (user.getStatusId().getStatusId() == 5) { // Cấm vĩnh viễn
-	                model.addAttribute("errorMessage", "Tài khoản của bạn đã bị cấm vĩnh viễn.");
-	                return "/login/logintest";
-	            } else {
-	                // Trường hợp không xác định trạng thái
-	                model.addAttribute("errorMessage", "Trạng thái tài khoản không xác định.");
-	                return "/login/logintest";
+	                    
+	                    // Redirect to the appropriate page based on the user role
+	                    if (user.getRoleId().getRoleId() == 1) {
+	                        // Redirect to admin page if the user is admin
+	                        return "redirect:/admin/index";
+	                    } else {
+	                        // Redirect to home page for regular users
+	                        return "redirect:/home/index";
+	                    }
+	                case 2: // Inactive
+	                    model.addAttribute("errorMessage", "Tài khoản của bạn không hoạt động.");
+	                    break;
+	                case 3: // Pending
+	                    model.addAttribute("errorMessage", "Tài khoản của bạn đang chờ xử lý.");
+	                    break;
+	                case 4: // Suspended
+	                    model.addAttribute("errorMessage", "Tài khoản của bạn đã bị tạm đình chỉ.");
+	                    break;
+	                case 5: // Banned
+	                    model.addAttribute("errorMessage", "Tài khoản của bạn đã bị cấm vĩnh viễn.");
+	                    break;
+	                default:
+	                    model.addAttribute("errorMessage", "Trạng thái tài khoản không xác định.");
+	                    break;
 	            }
 	        } else {
-	            // Người dùng không được tìm thấy (trường hợp này lý tưởng không nên xảy ra nếu đăng nhập thành công)
+	            // User not found (should not occur if login is successful)
 	            model.addAttribute("errorMessage", "Người dùng không được tìm thấy.");
-	            return "/login/logintest";
 	        }
 	    } else {
-	        // Thông tin đăng nhập không hợp lệ
+	        // Invalid login information
 	        model.addAttribute("errorMessage", "Thông tin đăng nhập không hợp lệ.");
-	        return "/login/logintest";
 	    }
+
+	    // Return to the login page with an error message if login fails
+	    return "/login/logintest";
 	}
+
 
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
