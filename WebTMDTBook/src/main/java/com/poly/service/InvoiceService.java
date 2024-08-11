@@ -8,19 +8,19 @@ public interface InvoiceService {
 
 	List<Invoice> getAllInvoices();
 
-	//Khang
+	// Khang
 	List<Invoice> searchInvoices(String searchQuery);
 
 	Long getTotalOrders();
 
 	Double getTotalAmount();
 
-	//Khang
-	Invoice findById(Integer id);
+	// Khang
+	Invoice findByInvoice(Integer invoiceId);
 
-	//Khang
+	// Khang
 	List<Invoice> findByStatusName(String statusName);
-	
-	//Khang
+
+	// Khang
 	void save(Invoice invoice);
 }
