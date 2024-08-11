@@ -134,6 +134,7 @@ img {
 							bản: <b th:text="${product.manufacturer}"></b> <br> Số
 							trang: <b th:text="${product.NumberOfPages}"></b>
 						</p>
+						<br>
 						<p class="giaBan">
 							<strong style="color: red;" th:text="${discountedPrice} + ' VNĐ'"></strong>
 						</p>
@@ -147,15 +148,27 @@ img {
 						</p>
 
 						<hr>
+<!-- 
+						<div class="col-md-3">
+							<div class="d-flex align-items-center">
+								<button class="btn btn-secondary btn-sm"
+									onclick="decrementValue()">-</button>
+								<input class="form-control mx-2" id="value"
+									value="1"  style="width: 40px; text-align: center;">
+								<button class="btn btn-secondary btn-sm"
+									onclick="incrementValue()">+</button>
+							</div>
+						</div> -->
 
 						<a
 							th:href="@{/home/products/details/cart/{productId}(productId=${productId})}">
 							<button type="button" class="btn btn-outline-primary btnn">
 								<i class="fa-solid fa-cart-plus"></i> Thêm Vào Giỏ Hàng
 							</button>
-						</a> <a
+						</a><a
 							th:href="@{/products/details/cart/paynow(productId=${productId})}"
 							class="btn btn-primary btnn">Mua Ngay</a>
+
 					</div>
 				</div>
 			</div>
@@ -216,7 +229,7 @@ img {
 			<div class="col-md-12">
 				<div class="row">
 					<!-- Sử dụng th:each để lặp qua danh sách sản phẩm -->
-					<div th:each="p : ${products}" class="col-md-3 g-4">
+					<div th:each="p, iterStat : ${products}" class="col-md-3 g-4">
 						<a
 							th:href="@{/home/products/details/{productId}(productId=${p.productId})}">
 							<div class="card a-product">
@@ -229,21 +242,18 @@ img {
 									<p th:text="${p.author}"></p>
 									<div class="d-flex flex-column">
 										<h5 style="color: red; font-weight: 700"
-											th:text="${discountedPrice} + ' VNĐ'"></h5>
+											th:text="${discountedPrices[iterStat.index]} + 'VNĐ'"></h5>
 									</div>
-
 									<p class="giamGia">
-										<a th:text="${product.price}"></a> <a
-											class="badge text-bg-danger"> - <b
-											class="badge text-bg-danger"
-											th:text="${product.discountPercentage}"></b>%
+										<a th:text="${p.price}"></a> <a class="badge text-bg-danger">
+											- <b class="badge text-bg-danger"
+											th:text="${p.discountPercentage}"></b>%
 										</a>
 									</p>
-
 								</div>
 							</div>
-						</a>
 					</div>
+					</a>
 				</div>
 			</div>
 		</div>
@@ -335,6 +345,8 @@ img {
 		value++;
 		document.getElementById("value").textContent = value;
 	}
+	
+	
 	</script>
 	<!-- Bootstrap core JavaScript -->
 	<script src="/vendor/jquery/jquery.min.js"></script>
