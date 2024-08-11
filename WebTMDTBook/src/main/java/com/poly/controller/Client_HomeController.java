@@ -59,6 +59,18 @@ public class Client_HomeController {
 	@Autowired
 	CategoryService categoryService;
 
+// <<<<<<< duy
+// =======
+// //	@GetMapping("/index")
+// //	public String home(Model model) {
+// //		List<Product> products = productService.getAllProducts();
+// //		model.addAttribute("products", products);
+// //		List<Category> categories = categoryService.getAllCategory();
+// //		model.addAttribute("categories", categories);
+// //		return "indexClient";
+// //	}
+	
+// >>>>>>> update_Code
 	@GetMapping("/index")
 	public String home(Model model) {
 	    List<Product> products = productService.getAllProducts(); // Lấy tất cả sản phẩm
@@ -89,22 +101,15 @@ public class Client_HomeController {
 	    return "indexClient"; // Trả về view indexClient
 	}
 
-	@GetMapping("/filter/{categoryId}")
-	public String locThieuThuyet(Model model, @PathVariable("categoryId") Integer categoryId) {
-		List<Product> products = productService.getProductsByCategoryId(categoryId);
-		model.addAttribute("products", products);
-		return "client/Product";
-	}
-
 	@GetMapping("/products")
 	public String products(Model model, 
 	                       @RequestParam(name = "keyName", required = false) String keyName,
 	                       @RequestParam("pageNo") Optional<Integer> pageNo,
-	                       @RequestParam(name = "categoryId", required = false) Integer categoryId,
-	                       @RequestParam(name = "productId", required = false) Integer productId) {
+	                       @RequestParam(name = "categoryId", required = false) Integer categoryId) {
 
+	    int pageSize = 6; // Số sản phẩm trên mỗi trang
 	    Sort sort = Sort.by(Sort.Direction.DESC, "productId");
-	    Pageable pageable = PageRequest.of(pageNo.orElse(0), 10, sort);
+	    Pageable pageable = PageRequest.of(pageNo.orElse(0), pageSize, sort);
 
 	    Page<Product> page;
 	    if (StringUtils.hasText(keyName)) {
@@ -115,41 +120,44 @@ public class Client_HomeController {
 	        page = productRepository.findAll(pageable);
 	    }
 
-	    List<Integer> totalPages = new ArrayList<>();
-	    for (int i = 0; i < page.getTotalPages(); i++) {
-	        totalPages.add(i + 1);
-	    }
+	    int totalPages = page.getTotalPages(); // Tổng số trang
+	    int currentPage = pageNo.orElse(0); // Trang hiện tại
 
 	    List<Product> products = page.getContent();
 	    List<Category> categories = categoryRepository.findAll(Sort.by(Sort.Direction.DESC, "categoryId"));
 
-	    // Tính toán giá giảm giá cho từng sản phẩm
 	    List<Double> discountedPrices = new ArrayList<>();
 	    for (Product product : products) {
 	        double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
 	        discountedPrices.add(discountedPrice);
 	    }
+	    
+	    if (products.isEmpty()) {
+	        model.addAttribute("noProductsFound", true);
+	    } else {
+	        model.addAttribute("products", products);
+	    }
 
 	    model.addAttribute("categories", categories);
 	    model.addAttribute("totalPageProduct", totalPages);
 	    model.addAttribute("pageProduct", page);
-	    model.addAttribute("pageClick", pageNo.orElse(0));
+	    model.addAttribute("pageClick", currentPage);
 	    model.addAttribute("products", products);
 	    model.addAttribute("discountedPrices", discountedPrices);
 	    model.addAttribute("selectedCategoryId", categoryId);
 
 	    return "client/Product";
 	}
-
-
+	
 
 	@PostMapping("/products")
 	public String priceProducts(Model model, @RequestParam("pageNo") Optional<Integer> pageNo,
 			@RequestParam(name = "categoryId", required = false) Integer categoryId,
+			@RequestParam(name = "productId", required = false) Integer productId,
 			@RequestParam("price_range") Optional<String> priceRange) {
 
 		Sort sort = Sort.by(Direction.DESC, "productId");
-		Pageable pageable = PageRequest.of(pageNo.orElse(0), 10, sort);
+		Pageable pageable = PageRequest.of(pageNo.orElse(0), 6, sort);
 
 		Page<Product> page;
 		if (priceRange.isPresent()) {
@@ -164,8 +172,7 @@ public class Client_HomeController {
 			page = productRepository.findAll(pageable);
 		}
 
-		 
-     
+		
 		List<Integer> totalPages = new ArrayList<>();
 		for (int i = 0; i < page.getTotalPages(); i++) {
 			totalPages.add(i + 1);
@@ -173,16 +180,30 @@ public class Client_HomeController {
 
 		List<Product> products = page.getContent();
 		List<Category> categories = categoryRepository.findAll(Sort.by(Direction.DESC, "categoryId"));
+		
+		List<Double> discountedPrices = new ArrayList<>();
+	    for (Product product : products) {
+	        double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
+	        discountedPrices.add(discountedPrice);
+	    }
+	    
+	    if (products.isEmpty()) {
+	        model.addAttribute("noProductsFound", true);
+	    } else {
+	        model.addAttribute("products", products);
+	    }
 
 		model.addAttribute("categories", categories);
 		model.addAttribute("totalPageProduct", totalPages);
 		model.addAttribute("pageProduct", page);
 		model.addAttribute("pageClick", pageNo.orElse(0));
 		model.addAttribute("products", products);
+		model.addAttribute("discountedPrices", discountedPrices);
 		model.addAttribute("selectedCategoryId", categoryId);
 
 		return "client/Product";
 	}
+	
 	
 	@GetMapping("/products/details/{productId}")
 	public String productDetails(Model model, @PathVariable("productId") Integer productId,
@@ -198,7 +219,7 @@ public class Client_HomeController {
 	       
 	            double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
 	            model.addAttribute("discountedPrice", discountedPrice);
-	        
+	                   
 
 	        // Phân trang danh sách sản phẩm
 	        Sort sort = Sort.by(Sort.Direction.DESC, "productId");
@@ -211,11 +232,19 @@ public class Client_HomeController {
 	        }
 
 	        List<Product> products = page.getContent();
+	        
+	        List<Double> discountedPrices = new ArrayList<>();
+		    for (Product productss : products) {
+		        double discountedPrice1 = productss.getPrice() - ((productss.getPrice() * productss.getDiscountPercentage()) / 100);
+		        discountedPrices.add(discountedPrice1);
+		    }
+
 
 	        model.addAttribute("totalPageProduct", totalPages);
 	        model.addAttribute("pageProduct", page);
 	        model.addAttribute("pageClick", pageNo.orElse(0));
 	        model.addAttribute("products", products);
+	        model.addAttribute("discountedPrices", discountedPrices);
 
 	        return "client/ProductDetails";
 	        

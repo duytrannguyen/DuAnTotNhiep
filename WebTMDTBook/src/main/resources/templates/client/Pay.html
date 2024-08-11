@@ -27,13 +27,14 @@
 	crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-	
- <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
- <link rel="stylesheet" href="/assets/css/fontawesome.css">
-    <link rel="stylesheet" href="/assets/css/templatemo-liberty-market.css">
-    <link rel="stylesheet" href="/assets/css/owl.css">
-    <link rel="stylesheet" href="/assets/css/animate.css">
-    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+
+<link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/fontawesome.css">
+<link rel="stylesheet" href="/assets/css/templatemo-liberty-market.css">
+<link rel="stylesheet" href="/assets/css/owl.css">
+<link rel="stylesheet" href="/assets/css/animate.css">
+<link rel="stylesheet"
+	href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
 <style type="text/css">
 .card {
 	margin-top: 15px;
@@ -68,195 +69,244 @@ form {
 </head>
 
 <body>
-    <!-- Include header using Thymeleaf -->
-<!--     <div th:include="~{client_layout/header :: header}"></div> -->
-<div th:replace="client_layout/header :: header"></div>
-    <br>
-    <br>
+	<!-- Include header using Thymeleaf -->
+	<!--     <div th:include="~{client_layout/header :: header}"></div> -->
+	<div th:replace="client_layout/header :: header"></div>
+	<br>
+	<br>
 
-    <form th:action="@{/products/details/cart/pay}" method="post" th:object="${invoice}">
-        <div class="container">
-            <div class="card mt-5">
-                <strong>ĐỊA CHỈ GIAO HÀNG</strong>
-                <hr>
+	<form th:action="@{/products/details/cart/pay}" method="post"
+		th:object="${invoice}">
+		<div class="container">
+			<div class="card mt-5">
+				<strong>ĐỊA CHỈ GIAO HÀNG</strong>
+				<hr>
 
-                <div class="row mb-3">
-                    <label for="fullName" class="col-sm-2 col-form-label">Họ và tên người nhận</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="fullName" placeholder="Nhập họ và tên" th:value="${user.fullName}" required>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label for="email" class="col-sm-2 col-form-label">Email</label>
-                    <div class="col-sm-10">
-                        <input type="email" class="form-control" id="email" placeholder="Nhập email" th:value="${user.email}" required>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label for="address" class="col-sm-2 col-form-label">Địa Chỉ Nhận Hàng</label>
-                    <div class="col-sm-10">
-                        <!-- Input for address is commented out. Uncomment if needed. -->
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label for="phone" class="col-sm-2 col-form-label">Số điện thoại</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="phone" placeholder="10 ký tự số" th:value="${user.phone}" required>
-                    </div>
-                </div>
+				<div class="row mb-3">
+					<label for="fullName" class="col-sm-2 col-form-label">Họ và
+						tên người nhận</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="fullName"
+							placeholder="Nhập họ và tên" th:value="${user.fullName}" required>
+					</div>
+				</div>
+				<div class="row mb-3">
+					<label for="email" class="col-sm-2 col-form-label">Email</label>
+					<div class="col-sm-10">
+						<input type="email" class="form-control" id="email"
+							placeholder="Nhập email" th:value="${user.email}" required>
+					</div>
+				</div>
+				<div class="row mb-3">
+					<label for="address" class="col-sm-2 col-form-label">Địa
+						Chỉ Nhận Hàng</label>
+					<div class="col-sm-10">
+						<!-- Input for address is commented out. Uncomment if needed. -->
+					</div>
+				</div>
+				<div class="row mb-3">
+					<label for="phone" class="col-sm-2 col-form-label">Số điện
+						thoại</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="phone"
+							placeholder="10 ký tự số" th:value="${user.phone}" required>
+					</div>
+				</div>
 
-                <div class="card">
-                    <strong>PHƯƠNG THỨC VẬN CHUYỂN</strong>
-                    <hr>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="shipping_id" id="standardShipping" th:value="2" checked>
-                        <label class="form-check-label" for="standardShipping">
-                            <strong>Giao hàng tiêu chuẩn: 32.000 VNĐ</strong><br>
-                            <p style="font-size: small;">Thứ 6 - 25/6</p>
-                        </label>
-                    </div>
-                </div>
+				<div class="card">
+					<strong>PHƯƠNG THỨC VẬN CHUYỂN</strong>
+					<hr>
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="shipping_id"
+							id="standardShipping" th:value="2" checked> <label
+							class="form-check-label" for="standardShipping"> <strong>Giao
+								hàng tiêu chuẩn: 32.000 VNĐ</strong><br>
+							<p style="font-size: small;">Thứ 6 - 25/6</p>
+						</label>
+					</div>
+				</div>
 
-                <div class="card">
-                    <strong>PHƯƠNG THỨC THANH TOÁN</strong>
-                    <hr>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_method_id" id="vnPay" th:value="2">
-                        <label class="form-check-label" for="vnPay">
-                            <i class="fa-regular fa-credit-card" style="font-size: x-large;"></i> VNPay
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_method_id" id="cashOnDelivery" th:value="1" checked>
-                        <label class="form-check-label" for="cashOnDelivery">
-                            <i class="fa-regular fa-money-bill-1" style="font-size: x-large;"></i> Thanh toán khi nhận hàng
-                        </label>
-                    </div>
-                </div>
+				<div class="card">
+					<strong>PHƯƠNG THỨC THANH TOÁN</strong>
+					<hr>
+					<div class="form-check">
+						<input class="form-check-input" type="radio"
+							name="payment_method_id" id="vnPay" th:value="2"> <label
+							class="form-check-label" for="vnPay"> <i
+							class="fa-regular fa-credit-card" style="font-size: x-large;"></i>
+							Thanh toán VNPay
+						</label>
+					</div>
+					<div class="form-check">
+						<input class="form-check-input" type="radio"
+							name="payment_method_id" id="internetbanking" th:value="3">
+						<label class="form-check-label" for="internetbanking"> <i
+							class="fa-solid fa-credit-card" style="font-size: x-large;"></i>
+							Thanh toán Internetbanking
+						</label>
+					</div>
+					<div class="form-check">
+						<input class="form-check-input" type="radio"
+							name="payment_method_id" id="cashOnDelivery" th:value="1" checked>
+						<label class="form-check-label" for="cashOnDelivery"> <i
+							class="fa-regular fa-money-bill-1" style="font-size: x-large;"></i>
+							Thanh toán khi nhận hàng
+						</label>
+					</div>
+				</div>
 
-                <div class="card">
-                    <strong>MÃ KHUYẾN MÃI/MÃ QUÀ TẶNG</strong>
-                    <hr>
-                    <div class="row g-3 align-items-center">
-                        <div class="col-sm-7">
-                            <div class="col-auto">
-                                <label for="discountCode" class="col-form-label">Mã Khuyến Mãi</label>
-                            </div>
-                            <div class="col-auto">
-                                <div class="input-group">
-                                    <input type="text" id="discountCode" class="form-control w-auto" placeholder="Nhập mã khuyến mãi" oninput="handleDiscountInput()">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-xs col-auto" type="button" onclick="applyDiscount()">Áp dụng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+				<div class="card">
+					<strong>MÃ KHUYẾN MÃI/MÃ QUÀ TẶNG</strong>
+					<hr>
+					<div class="row g-3 align-items-center">
+						<div class="col-sm-7">
+							<div class="col-auto">
+								<label for="discountCode" class="col-form-label">Mã
+									Khuyến Mãi</label>
+							</div>
+							<div class="col-auto">
+								<div class="input-group">
+									<input type="text" id="discountCode"
+										class="form-control w-auto" name="discount_code"
+										placeholder="Nhập mã khuyến mãi"
+										oninput="handleDiscountInput()"> <input type="hidden"
+										id="discountIdHiddenInput" name="discount_id">
+									<div class="input-group-append">
+										<button class="btn btn-primary btn-xs col-auto" type="button"
+											onclick="applyDiscount()">Áp dụng</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-                <div class="card">
-                    <strong>THÔNG TIN KHÁC</strong>
-                    <hr>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="noteCheck">
-                        <label class="form-check-label" for="noteCheck"> Ghi Chú </label>
-                    </div>
-                    <div id="note-input-container" style="display: none;">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="noteInput" placeholder="Ghi chú">
-                            <label for="noteInput">Ghi chú</label>
-                        </div>
-                    </div>
-                </div>
+				<div class="card">
+					<strong>THÔNG TIN KHÁC</strong>
+					<hr>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" id="noteCheck">
+						<label class="form-check-label" for="noteCheck"> Ghi Chú </label>
+					</div>
+					<div id="note-input-container" style="display: none;">
+						<div class="form-floating mb-3">
+							<input type="text" class="form-control" id="noteInput"
+								placeholder="Ghi chú"> <label for="noteInput">Ghi
+								chú</label>
+						</div>
+					</div>
+				</div>
 
-                <div class="card" style="margin-bottom: 250px;">
-                    <strong>KIỂM TRA LẠI ĐƠN HÀNG</strong>
-                    <hr>
-                    <div class="col-md-12">
-                        <div th:each="item : ${cartItems}" class="row">
-                            <div class="col-md-2">
-                                <img th:src="@{/images/{imageName}(imageName=${item.productId.imageId.imageName})}" style="width: 150px; height: 150px;">
-                            </div>
-                            <div class="col-md-5">
-                                <p th:text="${item.productId.productName}"></p>
-                            </div>
-                            <div class="col-md-1">
-                                <p th:text="${item.quantity}"></p>
-                            </div>
-                            <div class="col-md-2">
-                                <p>
-                                    <span th:text="${item.productId.price} + ' VNĐ'"></span>
-                                </p>
-                                <p class="giaGiam text-body-tertiary">
-                                    <span th:text="${item.productId.price} + ' VNĐ'"></span>
-                                </p>
-                            </div>
-                            <div class="col-md-2">
-                                <p class="text-primary fw-bold">
-                                    <span th:text="${item.productId.price * item.quantity} + ' VNĐ'"></span>
-                                </p>
-                            </div>
-                        </div>
-                        <hr>
-                    </div>
-                </div>
-            </div>
-            <br>
-        </div>
+				<div class="card" style="margin-bottom: 250px;">
+					<strong>KIỂM TRA LẠI ĐƠN HÀNG</strong>
+					<hr>
+					<div class="col-md-12">
+						<div th:each="item : ${cartItems}" class="row">
+							<div class="col-md-2">
+								<img
+									th:src="@{/images/{imageName}(imageName=${item.productId.imageId.imageName})}"
+									style="width: 150px; height: 150px;">
+							</div>
+							<div class="col-md-5">
+								<p th:text="${item.productId.productName}"></p>
+								<input type="hidden" name="productName"
+									th:value="${item.productId.productName}" />
+							</div>
+							<div class="col-md-1">
+								<p th:text="${item.quantity}"></p>
+								<input type="hidden" name="quantity"
+									th:value="${item.quantity}" />
+							</div>
+							<div class="col-md-2">
+								<p>
+									<span
+										th:text="${item.productId.price - (item.productId.price * item.productId.discountPercentage / 100)} + ' VNĐ'"></span>
+									<input type="hidden" name="price"
+										th:value="${item.productId.price - (item.productId.price * item.productId.discountPercentage / 100)}" />
+								</p>
+								<p class="giaGiam text-body-tertiary">
+									<span th:text="${item.productId.price} + ' VNĐ'"></span>
 
-        <div class="footer">
-            <div class="card">
-                <div class="container">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-6"></div>
-                            <div class="col-md-3">
-                                <p class="text-end">Thành tiền</p>
-                                <p class="text-end">Khuyến mãi</p>
-                                <p class="text-end">Phí vận chuyển (Giao hàng tiêu chuẩn)</p>
-                                <p class="text-end fw-bold">Tổng tiền (gồm VAT)</p>
-                            </div>
-                            <div class="col-md-2">
-                                <p class="text-end">
-                                    <span id="itemTotal" th:text="${total ?: 0} + ' VNĐ'"></span>
-                                </p>
-                                <input type="hidden" name="status" th:value="${status ?: 1}"/>
+								</p>
 
-                                <p class="text-end">
-                                    <span id="discountAmount" th:text="${discountAmount ?: 0} + ' VNĐ'"></span>
-                                </p>
-                                <p class="text-end">32.000 VNĐ</p>
-                                <p class="text-end text-primary fw-bold">
-                                    <span id="totalAmount" th:text="${(total ?: 0) - (discountAmount ?: 0) + 32000} + ' VNĐ'"></span>
-                                   <input type="hidden" name="totalAmount" th:value="${(total ?: 0) - (discountAmount ?: 0) + 32000}"/>
-                                </p>
-                            </div>
-                            <div class="col-md-1"></div>
-                        </div>
-                    </div>
 
-                    <hr>
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-7">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="agreeTerms">
-                                    <label class="form-check-label" for="agreeTerms"> Bằng việc xác nhận mua hàng, bạn đã hoàn toàn đồng ý với
-                                        <p>
-                                            <a href="#" class="link-danger link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover fw-bold">Điều khoản & Điều kiện</a> của chúng tôi.
-                                        </p>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-5 d-flex justify-content-center align-items-center">
-                                <button type="submit" id="confirmBtn" class="btn btn-outline-primary my-0" disabled>XÁC NHẬN ĐẶT HÀNG</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
+							</div>
+							<div class="col-md-2">
+								<p class="text-primary fw-bold">
+									<span
+										th:text="${item.productId.price - (item.productId.price * item.productId.discountPercentage / 100)} + ' VNĐ'"></span>
+								</p>
+							</div>
+						</div>
+						<hr>
+					</div>
+				</div>
+			</div>
+			<br>
+		</div>
+
+		<div class="footer">
+			<div class="card">
+				<div class="container">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-6"></div>
+							<div class="col-md-3">
+								<p class="text-end">Thành tiền</p>
+								<p class="text-end">Khuyến mãi</p>
+								<p class="text-end">Phí vận chuyển (Giao hàng tiêu chuẩn)</p>
+								<p class="text-end fw-bold">Tổng tiền (gồm VAT)</p>
+							</div>
+							<div class="col-md-2">
+								<p class="text-end">
+									<span id="itemTotal" th:text="${total ?: 0} + ' VNĐ'"></span>
+								</p>
+								<input type="hidden" name="status" th:value="${status ?: 1}" />
+
+								<p class="text-end">
+									<span id="discountAmount"
+										th:text="${discountAmount ?: 0} + ' VNĐ'"></span>
+								</p>
+								<p class="text-end">32.000 VNĐ</p>
+								<p class="text-end text-primary fw-bold">
+									<span id="totalAmount"
+										th:text="${(total ?: 0) - (discountAmount ?: 0) + 32000} + ' VNĐ'"></span>
+									<input type="hidden" name="totalAmount"
+										th:value="${(total ?: 0) - (discountAmount ?: 0) + 32000}" />
+								</p>
+							</div>
+							<div class="col-md-1"></div>
+						</div>
+					</div>
+
+					<hr>
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-7">
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="agreeTerms">
+									<label class="form-check-label" for="agreeTerms"> Bằng
+										việc xác nhận mua hàng, bạn đã hoàn toàn đồng ý với
+										<p>
+											<a href="#"
+												class="link-danger link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover fw-bold">Điều
+												khoản & Điều kiện</a> của chúng tôi.
+										</p>
+									</label>
+								</div>
+							</div>
+							<div
+								class="col-md-5 d-flex justify-content-center align-items-center">
+								<button type="submit" id="confirmBtn"
+									class="btn btn-outline-primary my-0" disabled>XÁC NHẬN
+									ĐẶT HÀNG</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
 
 	<script>
 		function handleDiscountInput() {
@@ -340,14 +390,14 @@ form {
 			}
 		});
 	</script>
-    <!-- Bootstrap core JavaScript -->
-    <script src="/vendor/jquery/jquery.min.js"></script>
-    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/isotope.min.js"></script>
-    <script src="/assets/js/owl-carousel.js"></script>
-    <script src="/assets/js/tabs.js"></script>
-    <script src="/assets/js/popup.js"></script>
-    <script src="/assets/js/custom.js"></script>
+	<!-- Bootstrap core JavaScript -->
+	<script src="/vendor/jquery/jquery.min.js"></script>
+	<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="/assets/js/isotope.min.js"></script>
+	<script src="/assets/js/owl-carousel.js"></script>
+	<script src="/assets/js/tabs.js"></script>
+	<script src="/assets/js/popup.js"></script>
+	<script src="/assets/js/custom.js"></script>
 </body>
 </html>
 <!-- 				<div class="row mb-3"> -->

@@ -94,15 +94,16 @@ a {
 											</tr>
 										</thead>
 										<tbody>
-											<tr th:each="item  : ${cartItems}">
+											<tr th:each="item : ${cartItems}">
 												<form th:action="@{/cart/update}" method="post">
 													<input th:value="${item.cartItemId}" name="cartItemId"
-														type="hidden" />
+														type="hidden" /> 
 													<td><input class="form-check-input item-checkbox"
 														type="checkbox" name="cartItemIds"
 														th:value="${item.cartItemId}"
-														data-price="${item.productId.price * item.quantity}"
+														th:data-price="${(item.productId.price - ((item.productId.price * item.productId.discountPercentage) / 100)) * item.quantity}"
 														onchange="calculateTotal()"></td>
+
 													<td><img alt=""
 														th:src="@{/Image_SP/{imageName}(imageName=${item.productId.imageId.imageName})}"
 														style="width: 80px; height: 80px;"></td>
@@ -116,15 +117,18 @@ a {
 															onclick="incrementValue(this.previousElementSibling)">+</button>
 													</td>
 													<td><b
-														th:text="${item.productId.price - ((item.productId.price * item.productId.discountPercentage) / 100)} + ' VNĐ'"></b></td>
+														th:text="${item.productId.price - ((item.productId.price * item.productId.discountPercentage) / 100)} + ' VNĐ'"></b>
+													</td>
 													<td><b
-														th:text="${(item.productId.price - ((item.productId.price * item.productId.discountPercentage) / 100)) * item.quantity} + ' VNĐ'"></b></td>
+														th:text="${(item.productId.price - ((item.productId.price * item.productId.discountPercentage) / 100)) * item.quantity} + ' VNĐ'"></b>
+													</td>
 													<td><a
-														th:href="@{/cart/remove/{cartItemId}(cartItemId=${item.cartItemId})}"><i
-															class="fa-solid fa-trash" style="color: #ed2323;"></i></a></td>
+														th:href="@{/cart/remove/{cartItemId}(cartItemId=${item.cartItemId})}">
+															<i class="fa-solid fa-trash" style="color: #ed2323;"></i>
+													</a></td>
 												</form>
 											</tr>
-											
+
 										</tbody>
 									</table>
 								</div>
@@ -138,7 +142,7 @@ a {
 								<div class="row">
 									<div class="col-md-9">
 										Thành tiền:
-										<p id="totalPrice">0 VNĐ</p>
+										<b><h6 id="totalPrice">0 VNĐ</h6></b>
 									</div>
 									<div class="col-md-3">
 										<span style="font-size: medium;"></span>
@@ -148,7 +152,7 @@ a {
 								<div class="row">
 									<div class="col-md-12">
 										<strong>Tổng Số Tiền (gồm VAT)</strong>
-										<p id="grandTotal">0 VNĐ</p>
+										<b><h4 style="color: red;" id="grandTotal">0 VNĐ</h4></b>
 									</div>
 								</div>
 							</div>
@@ -169,6 +173,8 @@ a {
 	<!-- Thay thế jsp:include bằng Thymeleaf th:replace -->
 
 	<div th:replace="~{client_layout/footer :: footer}"></div>
+
+	</div>
 
 	<script type="text/javascript">
     // Function to handle checkbox state changes
@@ -194,7 +200,12 @@ a {
 
         checkboxes.forEach(function(checkbox) {
             if (checkbox.checked) {
-                totalPrice += parseFloat(checkbox.getAttribute('data-price'));
+                let price = parseFloat(checkbox.getAttribute('data-price').replace(/,/g, '').trim());
+                if (!isNaN(price)) {
+                    totalPrice += price;
+                } else {
+                    console.error('Invalid price:', checkbox.getAttribute('data-price'));
+                }
             }
         });
 
@@ -204,7 +215,7 @@ a {
 
         // Enable/disable payment button based on checkbox status
         var paymentButton = document.getElementById('paymentButton');
-        paymentButton.disabled = totalPrice === 0; // Disable if no items are checked
+        paymentButton.disabled = totalPrice === 0;
     }
 
     // Function to handle payment button click
@@ -216,34 +227,36 @@ a {
         if (cartItemIds !== '') {
             window.location.href = "/products/details/cart/pay?cartItemIds=" + cartItemIds;
         } else {
-            alert("Please select at least one item to proceed to payment.");
+            alert("Vui lòng chọn ít nhất một mặt hàng để tiếp tục thanh toán.");
         }
     }
 
     // Function to increment quantity
     function incrementValue(inputField) {
-        var currentValue = parseInt(inputField.value);
+        var currentValue = parseInt(inputField.value, 10) || 0;
         inputField.value = currentValue + 1;
-        inputField.onblur();
+        inputField.dispatchEvent(new Event('blur'));
     }
 
     // Function to decrement quantity
     function decrementValue(inputField) {
-        var currentValue = parseInt(inputField.value);
+        var currentValue = parseInt(inputField.value, 10) || 0;
         if (currentValue > 1) {
             inputField.value = currentValue - 1;
-            inputField.onblur();
+            inputField.dispatchEvent(new Event('blur'));
         }
     }
 </script>
-</body>
-	<!-- Bootstrap core JavaScript -->
-	<script src="/vendor/jquery/jquery.min.js"></script>
-	<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-	<script src="/assets/js/isotope.min.js"></script>
-	<script src="/assets/js/owl-carousel.js"></script>
-	<script src="/assets/js/tabs.js"></script>
-	<script src="/assets/js/popup.js"></script>
-	<script src="/assets/js/custom.js"></script>
+
+</body>
+<!-- Bootstrap core JavaScript -->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<script src="/assets/js/isotope.min.js"></script>
+<script src="/assets/js/owl-carousel.js"></script>
+<script src="/assets/js/tabs.js"></script>
+<script src="/assets/js/popup.js"></script>
+<script src="/assets/js/custom.js"></script>
 </html>

@@ -58,4 +58,5 @@ public interface DiscountRepositopy extends JpaRepository<Discount, Integer> {
 	Optional<Discount> findByDiscountCode(String discountCode);
 	 // Tìm mã khuyến mãi dựa trên mã khuyến mãi
    // Optional<Discount> findByCode(String code);
+
 }
