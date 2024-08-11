@@ -1,4 +1,5 @@
 package com.poly.service.lmpl;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,26 +41,24 @@ public class InvoiceServiceImpl implements InvoiceService {
 //		return invoiceRepository.findByInvoiceIdOrCartUserFullNameContaining(invoiceId, searchQuery);
 //	}
 
-	//Khang
+	// Khang
 	@Override
-	public Invoice findById(Integer id) {
-		return invoiceRepository.findById(id).orElse(null);
+	public Invoice findByInvoice(Integer invoiceId) {
+		return invoiceRepository.findById(invoiceId).orElse(null);
 	}
 
-	//Khang
+	// Khang
 	@Override
 	public List<Invoice> findByStatusName(String statusName) {
 		return invoiceRepository.findByStatusStatusName(statusName);
 	}
 
-	//Khang
+	// Khang
 	@Override
 	public void save(Invoice invoice) {
 		invoiceRepository.save(invoice);
 	}
-	
-	
-	
+
 //ly
 	@Override
 	public List<Invoice> searchInvoices(String searchQuery) {
@@ -69,7 +68,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 	@Override
 	public List<Invoice> getAllInvoices() {
-		// TODO Auto-generated method stub
-		return null;
+		return invoiceRepository.findAllInvoicesWithDetails();
 	}
+
 }
