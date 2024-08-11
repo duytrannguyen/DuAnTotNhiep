@@ -32,7 +32,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin/baocaothongke")
 public class Admin_HomeController {
 
 	@Autowired
@@ -87,30 +87,22 @@ public class Admin_HomeController {
 //		return "indexAdmin";
 //
 //	}
-	@GetMapping("/index")
-	public String listProducts(Model model, HttpServletRequest req,
-			@RequestParam(name = "pageNo", defaultValue = "0") int page,
-			@RequestParam(name = "size", defaultValue = "10") int size) {
-		// Sắp xếp theo ID giảm dần
-		Pageable pageable = PageRequest.of(page, size, Sort.by("productId").descending());
+	@GetMapping("/report")
+	public String listProducts(Model model) {
+		int totalCustomers = userService.getTotalUsers();
+		int totalProducts = productService.getTotalProducts();
+		Long totalOrders = invoiceService.getTotalOrders(); // Fetch total orders
+		Double totalAmount = invoiceService.getTotalAmount(); // Fetch total amount
 
-		Page<Product> productPage = productsRepository.findAll(pageable);
+		List<Product> products = productService.getAllProducts();
+		model.addAttribute("products", products);
 
-		// Thêm thông tin sản phẩm vào model
-		model.addAttribute("pageProd", productPage.getContent());
-		model.addAttribute("currentPage", page);
-		model.addAttribute("totalPages", productPage.getTotalPages());
+		model.addAttribute("totalCustomers", totalCustomers);
+		model.addAttribute("totalProducts", totalProducts);
+		model.addAttribute("totalOrders", totalOrders); // Add total orders to the model
+		model.addAttribute("totalAmount", totalAmount); // Add total amount to the model
 
-		// Lấy danh sách thể loại
-		List<Category> categories = categoryRepository.findAll();
-		model.addAttribute("categories", categories);
-
-		// Lấy danh sách trạng thái sản phẩm
-		List<ProductStatus> productStatus = productStatusRepository.findAll();
-		model.addAttribute("productStatus", productStatus);
-
-		// Thiết lập view
-		req.setAttribute("view", "/admin/QuanLySanPham/Products.html");
-		return "indexAdmin";
+		return "admin/BaoCaoThongKe/Report";
 	}
+
 }
