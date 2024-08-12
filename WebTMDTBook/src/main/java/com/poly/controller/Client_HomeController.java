@@ -305,43 +305,43 @@ public class Client_HomeController {
 	}
 //>>>>>>> update_Code
 
-		try {
-			// Lấy sản phẩm chi tiết
-			Product product = productRepository.findById(productId)
-					.orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
-			model.addAttribute("product", product);
-
-			// Tính giá sau khi giảm
-
-			double discountedPrice = product.getPrice()
-					- ((product.getPrice() * product.getDiscountPercentage()) / 100);
-			model.addAttribute("discountedPrice", discountedPrice);
-
-			// Phân trang danh sách sản phẩm
-			Sort sort = Sort.by(Sort.Direction.DESC, "productId");
-			Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
-			Page<Product> page = productRepository.findAll(pageable);
-
-			List<Integer> totalPages = new ArrayList<>();
-			for (int i = 0; i < page.getTotalPages(); i++) {
-				totalPages.add(i + 1);
-			}
-
-			List<Product> products = page.getContent();
-
-			model.addAttribute("totalPageProduct", totalPages);
-			model.addAttribute("pageProduct", page);
-			model.addAttribute("pageClick", pageNo.orElse(0));
-			model.addAttribute("products", products);
-
-			return "client/ProductDetails";
-
-		} catch (Exception e) {
-			// Ghi log lỗi
-			e.printStackTrace();
-			return "error"; // Trả về trang lỗi nếu xảy ra ngoại lệ
-		}
-	}
+//		try {
+//			// Lấy sản phẩm chi tiết
+//			Product product = productRepository.findById(productId)
+//					.orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
+//			model.addAttribute("product", product);
+//
+//			// Tính giá sau khi giảm
+//
+//			double discountedPrice = product.getPrice()
+//					- ((product.getPrice() * product.getDiscountPercentage()) / 100);
+//			model.addAttribute("discountedPrice", discountedPrice);
+//
+//			// Phân trang danh sách sản phẩm
+//			Sort sort = Sort.by(Sort.Direction.DESC, "productId");
+//			Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
+//			Page<Product> page = productRepository.findAll(pageable);
+//
+//			List<Integer> totalPages = new ArrayList<>();
+//			for (int i = 0; i < page.getTotalPages(); i++) {
+//				totalPages.add(i + 1);
+//			}
+//
+//			List<Product> products = page.getContent();
+//
+//			model.addAttribute("totalPageProduct", totalPages);
+//			model.addAttribute("pageProduct", page);
+//			model.addAttribute("pageClick", pageNo.orElse(0));
+//			model.addAttribute("products", products);
+//
+//			return "client/ProductDetails";
+//
+//		} catch (Exception e) {
+//			// Ghi log lỗi
+//			e.printStackTrace();
+//			return "error"; // Trả về trang lỗi nếu xảy ra ngoại lệ
+//		}
+	
 
 //	@GetMapping("products/details/cart")
 //	public String Cart(Model model) {

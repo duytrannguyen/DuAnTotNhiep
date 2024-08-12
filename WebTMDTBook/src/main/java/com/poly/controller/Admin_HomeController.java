@@ -88,7 +88,7 @@ public class Admin_HomeController {
 //
 //	}
 	@GetMapping("/report")
-	public String listProducts(Model model) {
+	public String listProducts(Model model,HttpServletRequest req) {
 		int totalCustomers = userService.getTotalUsers();
 		int totalProducts = productService.getTotalProducts();
 		Long totalOrders = invoiceService.getTotalOrders(); // Fetch total orders
@@ -101,8 +101,8 @@ public class Admin_HomeController {
 		model.addAttribute("totalProducts", totalProducts);
 		model.addAttribute("totalOrders", totalOrders); // Add total orders to the model
 		model.addAttribute("totalAmount", totalAmount); // Add total amount to the model
-
-		return "admin/BaoCaoThongKe/Report";
+		req.setAttribute("view", "/admin/BaoCaoThongKe/Report.html");
+		return "indexAdmin";
 	}
 
 }

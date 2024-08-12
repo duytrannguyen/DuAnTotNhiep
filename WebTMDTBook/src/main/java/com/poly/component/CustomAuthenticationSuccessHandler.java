@@ -34,7 +34,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 	    String redirectUrl = "/";
 	    if (authentication.getAuthorities().stream()
 	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
-	        redirectUrl = "/admin/index"; // Chuyển đến trang admin
+	        redirectUrl = "/admin/baocaothongke/report"; // Chuyển đến trang admin
 	    } else if (authentication.getAuthorities().stream()
 	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_USER"))) {
 	        redirectUrl = "/home/index"; // Chuyển đến trang user

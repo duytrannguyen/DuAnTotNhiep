@@ -46,16 +46,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/home/login", "/home/logout").permitAll()
+                .requestMatchers("/home/login", "/home/logout","/home/login?error=true").permitAll()
                 .requestMatchers("/home/**", "/home/products/details/cart/**", "/products/details/cart/paynow/**", "/products/details/cart/pay", "/products/details/cart/pay/success").hasAnyRole("ADMIN", "USER")
-                .requestMatchers("/admin/**", "/admin/products/**", "/admin/voucher/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/home/index").permitAll()
                 .requestMatchers("/css/**", "/assets/**", "/Image_Users/**", "/images/**", "/vendor/**", "/Image_SP/**").permitAll()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form
                 .loginPage("/home/login")
-                .successHandler(customAuthenticationSuccessHandler) // Sử dụng CustomAuthenticationSuccessHandler
+                .successHandler(customAuthenticationSuccessHandler)
+                .failureUrl("/home/login?error=true") // Chuyển hướng nếu đăng nhập thất bại
                 .usernameParameter("username")
                 .passwordParameter("password")
                 .permitAll()
@@ -67,6 +68,7 @@ public class SecurityConfig {
             .httpBasic(Customizer.withDefaults())
             .build();
     }
+
 
 
     @Bean

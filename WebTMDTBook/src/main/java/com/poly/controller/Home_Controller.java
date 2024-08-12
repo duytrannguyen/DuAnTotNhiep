@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poly.dto.LoginDTO;
 import com.poly.dto.RegisterDTO;
@@ -50,57 +51,42 @@ public class Home_Controller {
 	}
 
 	@PostMapping("/login")
-	public String login(@ModelAttribute LoginDTO loginDTO, Model model, HttpSession session) {
-	    // Call userServiceImpl.login to check login information
+	public String login(@ModelAttribute LoginDTO loginDTO, RedirectAttributes redirectAttributes) {
 	    boolean result = userServiceImpl.login(loginDTO);
 
 	    if (result) {
-	        // Retrieve user information from the database
 	        User user = userServiceImpl.getUserByUsername(loginDTO.getUsername());
 
 	        if (user != null) {
-	            // Check the user's status
-	            switch (user.getStatusId().getStatusId()) {
-	                case 1: // Active
-	                    // Store user object in session
-	                    session.setAttribute("user", user);
-	                    model.addAttribute("successMessage", "Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
-	                    
-	                    // Redirect to the appropriate page based on the user role
-	                    if (user.getRoleId().getRoleId() == 1) {
-	                        // Redirect to admin page if the user is admin
-	                        return "redirect:/admin/index";
-	                    } else {
-	                        // Redirect to home page for regular users
-	                        return "redirect:/home/index";
-	                    }
-	                case 2: // Inactive
-	                    model.addAttribute("errorMessage", "Tài khoản của bạn không hoạt động.");
+	            int statusId = user.getStatusId().getStatusId();
+	            switch (statusId) {
+	                case 1: // Hoạt động
+	                    redirectAttributes.addFlashAttribute("successMessage", "Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
+	                    return user.getRoleId().getRoleId() == 1 ? "redirect:/admin/baocaothongke/report" : "redirect:/home/index";
+	                case 2: // Không hoạt động
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn không hoạt động.");
 	                    break;
-	                case 3: // Pending
-	                    model.addAttribute("errorMessage", "Tài khoản của bạn đang chờ xử lý.");
+	                case 3: // Chờ xử lý
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đang chờ xử lý.");
 	                    break;
-	                case 4: // Suspended
-	                    model.addAttribute("errorMessage", "Tài khoản của bạn đã bị tạm đình chỉ.");
+	                case 4: // Tạm đình chỉ
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đã bị tạm đình chỉ.");
 	                    break;
-	                case 5: // Banned
-	                    model.addAttribute("errorMessage", "Tài khoản của bạn đã bị cấm vĩnh viễn.");
+	                case 5: // Cấm vĩnh viễn
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đã bị cấm vĩnh viễn.");
 	                    break;
 	                default:
-	                    model.addAttribute("errorMessage", "Trạng thái tài khoản không xác định.");
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Trạng thái tài khoản không xác định.");
 	                    break;
 	            }
 	        } else {
-	            // User not found (should not occur if login is successful)
-	            model.addAttribute("errorMessage", "Người dùng không được tìm thấy.");
+	            redirectAttributes.addFlashAttribute("errorMessage", "Người dùng không được tìm thấy.");
 	        }
 	    } else {
-	        // Invalid login information
-	        model.addAttribute("errorMessage", "Thông tin đăng nhập không hợp lệ.");
+	        redirectAttributes.addFlashAttribute("errorMessage", "Thông tin đăng nhập không hợp lệ.");
 	    }
 
-	    // Return to the login page with an error message if login fails
-	    return "/login/logintest";
+	    return "redirect:/home/login"; // Chuyển hướng đến trang đăng nhập
 	}
 
 

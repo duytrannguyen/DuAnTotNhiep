@@ -27,6 +27,14 @@
 	crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/fontawesome.css">
+<link rel="stylesheet" href="/assets/css/templatemo-liberty-market.css">
+<link rel="stylesheet" href="/assets/css/owl.css">
+<link rel="stylesheet" href="/assets/css/animate.css">
+<link rel="stylesheet"
+	href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
 <style type="text/css">
 .card {
 	margin-top: 15px;
@@ -62,7 +70,8 @@ form {
 
 <body>
 	<!-- Include header using Thymeleaf -->
-	<div th:include="~{client_layout/header :: header}"></div>
+	<!--     <div th:include="~{client_layout/header :: header}"></div> -->
+	<div th:replace="client_layout/header :: header"></div>
 	<br>
 	<br>
 
@@ -92,14 +101,9 @@ form {
 					<label for="address" class="col-sm-2 col-form-label">Địa
 						Chỉ Nhận Hàng</label>
 					<div class="col-sm-10">
-						<!--     <input type="text" class="form-control" id="address" -->
-						<!--        th:value="${address.commune?.communeName}, ${address.district?.districtName}, ${address.province?.provinceName}" -->
-						<!--        required> -->
-
+						<!-- Input for address is commented out. Uncomment if needed. -->
 					</div>
-
 				</div>
-
 				<div class="row mb-3">
 					<label for="phone" class="col-sm-2 col-form-label">Số điện
 						thoại</label>
@@ -130,7 +134,15 @@ form {
 							name="payment_method_id" id="vnPay" th:value="2"> <label
 							class="form-check-label" for="vnPay"> <i
 							class="fa-regular fa-credit-card" style="font-size: x-large;"></i>
-							VNPay
+							Thanh toán VNPay
+						</label>
+					</div>
+					<div class="form-check">
+						<input class="form-check-input" type="radio"
+							name="payment_method_id" id="internetbanking" th:value="3">
+						<label class="form-check-label" for="internetbanking"> <i
+							class="fa-solid fa-credit-card" style="font-size: x-large;"></i>
+							Thanh toán Internetbanking
 						</label>
 					</div>
 					<div class="form-check">
@@ -155,15 +167,15 @@ form {
 							<div class="col-auto">
 								<div class="input-group">
 									<input type="text" id="discountCode"
-										class="form-control w-auto" placeholder="Nhập mã khuyến mãi"
-										oninput="handleDiscountInput()">
-
+										class="form-control w-auto" name="discount_code"
+										placeholder="Nhập mã khuyến mãi"
+										oninput="handleDiscountInput()"> <input type="hidden"
+										id="discountIdHiddenInput" name="discount_id">
 									<div class="input-group-append">
 										<button class="btn btn-primary btn-xs col-auto" type="button"
 											onclick="applyDiscount()">Áp dụng</button>
 									</div>
 								</div>
-
 							</div>
 						</div>
 					</div>
@@ -197,22 +209,32 @@ form {
 							</div>
 							<div class="col-md-5">
 								<p th:text="${item.productId.productName}"></p>
+								<input type="hidden" name="productName"
+									th:value="${item.productId.productName}" />
 							</div>
 							<div class="col-md-1">
 								<p th:text="${item.quantity}"></p>
+								<input type="hidden" name="quantity"
+									th:value="${item.quantity}" />
 							</div>
 							<div class="col-md-2">
 								<p>
-									<span th:text="${item.productId.price} + ' VNĐ'"></span>
+									<span
+										th:text="${item.productId.price - (item.productId.price * item.productId.discountPercentage / 100)} + ' VNĐ'"></span>
+									<input type="hidden" name="price"
+										th:value="${item.productId.price - (item.productId.price * item.productId.discountPercentage / 100)}" />
 								</p>
 								<p class="giaGiam text-body-tertiary">
 									<span th:text="${item.productId.price} + ' VNĐ'"></span>
+
 								</p>
+
+
 							</div>
 							<div class="col-md-2">
 								<p class="text-primary fw-bold">
 									<span
-										th:text="${item.productId.price * item.quantity} + ' VNĐ'"></span>
+										th:text="${item.productId.price - (item.productId.price * item.productId.discountPercentage / 100)} + ' VNĐ'"></span>
 								</p>
 							</div>
 						</div>
@@ -239,6 +261,8 @@ form {
 								<p class="text-end">
 									<span id="itemTotal" th:text="${total ?: 0} + ' VNĐ'"></span>
 								</p>
+								<input type="hidden" name="status" th:value="${status ?: 1}" />
+
 								<p class="text-end">
 									<span id="discountAmount"
 										th:text="${discountAmount ?: 0} + ' VNĐ'"></span>
@@ -247,6 +271,8 @@ form {
 								<p class="text-end text-primary fw-bold">
 									<span id="totalAmount"
 										th:text="${(total ?: 0) - (discountAmount ?: 0) + 32000} + ' VNĐ'"></span>
+									<input type="hidden" name="totalAmount"
+										th:value="${(total ?: 0) - (discountAmount ?: 0) + 32000}" />
 								</p>
 							</div>
 							<div class="col-md-1"></div>
@@ -364,7 +390,14 @@ form {
 			}
 		});
 	</script>
-	<script src="/js/address.js"></script>
+	<!-- Bootstrap core JavaScript -->
+	<script src="/vendor/jquery/jquery.min.js"></script>
+	<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="/assets/js/isotope.min.js"></script>
+	<script src="/assets/js/owl-carousel.js"></script>
+	<script src="/assets/js/tabs.js"></script>
+	<script src="/assets/js/popup.js"></script>
+	<script src="/assets/js/custom.js"></script>
 </body>
 </html>
 <!-- 				<div class="row mb-3"> -->

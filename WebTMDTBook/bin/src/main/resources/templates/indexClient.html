@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 
 <html xmlns:th="http://www.thymeleaf.org">
@@ -43,25 +44,29 @@
     50% { color: #fff; }
     100% { color: #F8CD0A; }
 }
-
+p{
+color: white;
+}
 @keyframes run {
     0% { transform: translateX(100%); } /* Bắt đầu bên phải */
     100% { transform: translateX(-100%); } /* Kết thúc bên trái */
 }
 
 </style>
+</head>
+<body>
 <div class="main-banner">
-	<header th:insert="client_layout/header :: header"></header>
+	<div th:insert="~{client_layout/header :: header}"></div>
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-6 align-self-center">
 				<div class="header-text">
-					<span class="fs-2">QLBook Store</span>
+					<p class="fs-2">QLBook Store</p>
 					<h2>Mua &amp; Bán Sách Chính Hãng.</h2>
-					<span>QLBook Store là một nơi hoàn hảo để bạn có thể tìm
+					<p>QLBook Store là một nơi hoàn hảo để bạn có thể tìm
 						kiếm tất cả các thể loại sách mà bạn mong muốn. Tại QLBook Store
 						bạn có thể mua, sở hữu cho mình những quyển sách, truyện độc quyền
-						chỉ có tại QLBook Store.</span>
+						chỉ có tại QLBook Store.</p>
 					<div class="buttons">
 						<div class="border-button">
 							<a href="/home/login">Đăng Nhập Ngay</a>
@@ -75,24 +80,24 @@
 			<div class="col-lg-4 offset-lg-2">
 				<div class="marquee">
 					<h2 class="text-animation" style="font-size: 38px;">
-						Sản phẩm <em>Sắp Được</em> Bán.
+						Sản phẩm <em>Sắp Được</em> Ra Mắt.
 					</h2>
 				</div>
 
 				<br> <br>
 				<div class="owl-banner owl-carousel">
-					<!-- <div class="item">
+					<div class="item"> 
 						<img src="/assets/images/poster-gioi-thieu-sach-11.jpg" alt="">
 					</div>
 					<div class="item">
 						<img src="/assets/images/poster-gioi-thieu-sach-9.jpg" alt="">
-					</div> -->
+					</div> 
 					<div th:each="product : ${upcomingProducts}">
 						<div class="item">
 							<img
 								th:src="@{/Image_SP/{imageName}(imageName=${product.imageId.imageName})}"
 								alt="" style="height: 400px;">
-							<div class="down-content">
+							<div class="down-content" style="color: white;">
 								<h4 class="book-title"
 									style="color: white; max-width: 100%; word-wrap: break-word;"
 									th:text="${product.productName}"></h4>
@@ -211,7 +216,7 @@
 		</div>
 	</div>
 </div>
-</div>
+
 
 <div class="create-nft">
 	<div class="container">
@@ -231,9 +236,9 @@
 						<img src="/assets/images/icon-02.png" alt="">
 					</div>
 					<h4 style="color: white;">Nhiều Sự Lựa Chọn</h4>
-					<span>Chúng tôi cung cấp một bộ sưu tập sách phong phú, bao
+					<p>Chúng tôi cung cấp một bộ sưu tập sách phong phú, bao
 						gồm các tiểu thuyết bán chạy nhất và sách được mọi người quan tâm,
-						phù hợp với mọi độc giả.</span>
+						phù hợp với mọi độc giả.</p>
 				</div>
 			</div>
 			<div class="col-lg-4">
@@ -242,10 +247,10 @@
 						<img src="/assets/images/icon-04.png" alt="">
 					</div>
 					<h4 style="color: white;">Giá Chiết Khấu</h4>
-					<span>Phần sách giảm giá của chúng tôi cung cấp mức giá
+					<p>Phần sách giảm giá của chúng tôi cung cấp mức giá
 						tuyệt vời cho những cuốn sách phổ biến, vì vậy bạn có thể thưởng
 						thức những cuốn sách yêu thích của mình mà không phải tốn nhiều
-						tiền.</span>
+						tiền.</p>
 				</div>
 			</div>
 			<div class="col-lg-4">
@@ -254,10 +259,10 @@
 						<img src="/assets/images/icon-06.png" alt="">
 					</div>
 					<h4 style="color: white;">Chuyển Phát Nhanh</h4>
-					<span>Chúng tôi coi trọng thời gian của bạn, đó là lý do tại
+					<p>Chúng tôi coi trọng thời gian của bạn, đó là lý do tại
 						sao chúng tôi cung cấp dịch vụ vận chuyển nhanh chóng cho tất cả
 						các đơn đặt hàng. Nhận sách của bạn được giao ngay trước cửa nhà
-						bạn trong thời gian ngắn</span>
+						bạn trong thời gian ngắn</p>
 				</div>
 			</div>
 		</div>
@@ -454,42 +459,42 @@
 <link rel="stylesheet" href="/assets/css/animate.css">
 <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
 <style> -->
-/* Custom CSS styles */
-/* .categories-collections .item {
-    text-align: center;
-    margin-bottom: 30px;
-}
+<!-- /* Custom CSS styles */ -->
+<!-- /* .categories-collections .item { -->
+<!--     text-align: center; -->
+<!--     margin-bottom: 30px; -->
+<!-- } -->
 
-.categories-collections .icon img {
-    max-width: 100%;
-    height: auto;
-}
+<!-- .categories-collections .icon img { -->
+<!--     max-width: 100%; -->
+<!--     height: auto; -->
+<!-- } -->
 
-.categories-collections .main-button a, .create-nft .item h4 {
-    margin-top: 15px;
-}
+<!-- .categories-collections .main-button a, .create-nft .item h4 { -->
+<!--     margin-top: 15px; -->
+<!-- } -->
 
-.create-nft .item p {
-    font-size: 15px;
-    line-height: 24px;
-    margin-bottom: 20px;
-}
+<!-- .create-nft .item p { -->
+<!--     font-size: 15px; -->
+<!--     line-height: 24px; -->
+<!--     margin-bottom: 20px; -->
+<!-- } -->
 
-footer {
-    background-color: #f8f9fa;
-    padding: 25px 0;
-    text-align: center;
-    margin-top: 30px;
-}
+<!-- footer { -->
+<!--     background-color: #f8f9fa; -->
+<!--     padding: 25px 0; -->
+<!--     text-align: center; -->
+<!--     margin-top: 30px; -->
+<!-- } -->
 
-footer p {
-    margin-bottom: 0;
-    font-size: 14px;
-    color: #6c757d;
-}
-</style>
-</head>
-<body> */
+<!-- footer p { -->
+<!--     margin-bottom: 0; -->
+<!--     font-size: 14px; -->
+<!--     color: #6c757d; -->
+<!-- } -->
+<!-- </style> -->
+<!-- </head> -->
+<!-- <body> */ -->
     <!-- ***** Header Area Start ***** -->
     <!-- Header area can be included using Thymeleaf fragment -->
 <!--     <div th:replace="client_layout/header :: header"></div> -->
@@ -700,8 +705,8 @@ footer p {
     <script src="/assets/js/tabs.js"></script>
     <script src="/assets/js/popup.js"></script>
     <script src="/assets/js/custom.js"></script>
-    <!-- Swiper Slider -->
+    Swiper Slider -->
 <!--     <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script> -->
-<!-- >>>>>>> ly --> -->
+
 </body>
 </html>
