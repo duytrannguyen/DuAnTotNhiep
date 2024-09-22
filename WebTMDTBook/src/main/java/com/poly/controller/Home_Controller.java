@@ -3,12 +3,14 @@ package com.poly.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poly.dto.LoginDTO;
 import com.poly.dto.RegisterDTO;
@@ -28,8 +30,7 @@ public class Home_Controller {
 
 	@Autowired
 	private UserService userService;
-	@Autowired
-	UserServiceImpl userServiceImpl;
+
 	@Autowired
 	private SessionService sessionService;
 
@@ -38,43 +39,57 @@ public class Home_Controller {
 
 	@Autowired
 	private InvoiceService invoiceService;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-	@GetMapping("/login")
+	@Autowired
+	private UserService userServiceImpl;
+
+	@RequestMapping("/login")
 	public String Login() {
 		return "login/logintest";
 	}
 
 	@PostMapping("/login")
-	public String login(@ModelAttribute LoginDTO loginDTO, Model model, HttpSession session) {
-	    // Call userServiceImpl.login to check login credentials
+	public String login(@ModelAttribute LoginDTO loginDTO, RedirectAttributes redirectAttributes) {
 	    boolean result = userServiceImpl.login(loginDTO);
 
 	    if (result) {
-	        // Retrieve user details from the database or wherever user information is stored
 	        User user = userServiceImpl.getUserByUsername(loginDTO.getUsername());
 
 	        if (user != null) {
-	            // Store user object in session
-	            session.setAttribute("user", user);
-
-	            if (user.getRoleId().getRoleId() == 1) {
-	                // Redirect to admin page if user is admin
-	                return "redirect:/admin/products/list";
-	            } else {
-	                // Redirect to home page for non-admin users
-	                return "redirect:/home/index";
+	            int statusId = user.getStatusId().getStatusId();
+	            switch (statusId) {
+	                case 1: // Hoạt động
+	                    redirectAttributes.addFlashAttribute("successMessage", "Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
+	                    return user.getRoleId().getRoleId() == 1 ? "redirect:/admin/baocaothongke/report" : "redirect:/home/index";
+	                case 2: // Không hoạt động
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn không hoạt động.");
+	                    break;
+	                case 3: // Chờ xử lý
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đang chờ xử lý.");
+	                    break;
+	                case 4: // Tạm đình chỉ
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đã bị tạm đình chỉ.");
+	                    break;
+	                case 5: // Cấm vĩnh viễn
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đã bị cấm vĩnh viễn.");
+	                    break;
+	                default:
+	                    redirectAttributes.addFlashAttribute("errorMessage", "Trạng thái tài khoản không xác định.");
+	                    break;
 	            }
 	        } else {
-	            // User not found (this scenario should ideally not happen if login was successful)
-	            model.addAttribute("mess", "User not found");
-	            return "/login/logintest";
+	            redirectAttributes.addFlashAttribute("errorMessage", "Người dùng không được tìm thấy.");
 	        }
 	    } else {
-	        // Invalid credentials
-	        model.addAttribute("mess", "Invalid credentials");
-	        return "/login/logintest";
+	        redirectAttributes.addFlashAttribute("errorMessage", "Thông tin đăng nhập không hợp lệ.");
 	    }
+
+	    return "redirect:/home/login"; // Chuyển hướng đến trang đăng nhập
 	}
+
+
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 		session.invalidate();

@@ -1,6 +1,7 @@
 package com.poly.model;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -31,7 +32,7 @@ public class Discount {
 
 	@Column(nullable = false)
 	@NotNull(message = "{NotNull.vc.quantity}")
-	@Min(value = 1, message = "{Min.vc.quantity}")
+	//@Min(value = 1, message = "{Min.vc.quantity}")
 	@Max(value = 100, message = "{Max.vc.quantity}")
 	Integer quantity;
 
@@ -62,7 +63,13 @@ public class Discount {
 	@Min(value = 0, message = "{Min.vc.minInvoiceAmount}")
 	Double minInvoiceAmount;
 	
+	@Column(name = "status_id")
+     Integer statusId ; 
+	
+	@OneToMany(mappedBy = "discount")
+     List<DiscountDetail> DiscountDetail;
 	public boolean isValid() {
 		return startDate != null && endDate != null && !startDate.after(endDate);
 	}
+	
 }
