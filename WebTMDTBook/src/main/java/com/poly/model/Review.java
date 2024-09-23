@@ -22,7 +22,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "Reviews", schema = "dbo", catalog = "DUANTN")
+@Table(name = "Reviews")
 @ToString
 public class Review {
 	@Id

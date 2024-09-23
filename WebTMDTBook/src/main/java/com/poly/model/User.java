@@ -32,7 +32,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "Users", schema = "dbo", catalog = "DUANTN")
+@Table(name = "Users")
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,18 +67,20 @@ public class User {
 	@ManyToOne
 	@JoinColumn(name = "roleId", nullable = false)
 	private Role roleId;
+	@ManyToOne
+	@JoinColumn(name = "statusId", nullable = false)
+	private UserStatus statusId;
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ShoppingCart> shoppingCarts = new ArrayList<>();
 
-	@OneToMany(mappedBy = "users_id", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
-    private List<Address> addresses = new ArrayList<>();
-
+	@OneToMany(mappedBy = "users_id", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	private List<Address> addresses = new ArrayList<>();
 
 	@Override
 	public String toString() {
 		return "User{address=" + addresses + "}";
 	}
+	@OneToMany(mappedBy = "user")
+    private List<DiscountDetail> DiscountDetail;
 
-
-	
 }
