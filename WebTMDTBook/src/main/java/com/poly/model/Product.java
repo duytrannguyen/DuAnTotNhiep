@@ -59,11 +59,14 @@ public class Product {
 	@Column(name = "percent_decrease")
 	private float percentDecrease;
 
-	@Column(name = "warranty")
-	private String warranty;
+	@Column(name = "price_decreased")
+	private float priceDecreased;
 
-	@Column(name = "rating")
-	private float rating;
+	// @Column(name = "warranty")
+	// private String warranty;
+
+	// @Column(name = "rating")
+	// private float rating;
 
 	@ManyToOne
 	@JoinColumn(name = "category_id", nullable = false)
@@ -71,7 +74,7 @@ public class Product {
 
 	@ManyToOne
 	@JoinColumn(name = "image_id", nullable = false)
-	private Image image;
+	private Image imageId;
 
 	@ManyToOne
 	@JoinColumn(name = "status_id", nullable = false)
@@ -84,7 +87,7 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	private List<Review> reviews;
 
-	@OneToMany(mappedBy = "product")
+	@OneToMany(mappedBy = "productId")
 	private List<CartItem> cartItems;
 
 	@OneToMany(mappedBy = "product")

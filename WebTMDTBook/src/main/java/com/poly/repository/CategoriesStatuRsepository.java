@@ -1,9 +1,10 @@
-package com.poly.repository;
+// package com.poly.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.poly.model.CategoriesStatus;
+// import com.poly.model.CategoriesStatus;
 
-public interface CategoriesStatuRsepository extends JpaRepository<CategoriesStatus, Integer>{
+// public interface CategoriesStatuRsepository extends
+// JpaRepository<CategoriesStatus, Integer>{
 
-}
+// }

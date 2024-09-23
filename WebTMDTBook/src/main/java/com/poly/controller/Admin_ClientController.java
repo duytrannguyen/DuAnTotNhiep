@@ -104,93 +104,91 @@ public class Admin_ClientController {
 
 	@GetMapping("/edit/{usersId}")
 	public String edit(HttpServletRequest req, Model model, @PathVariable(name = "usersId") Integer id) {
-	    User item = userRepository.findById(id).orElse(null);
-	    List<Role> roles = roleRepository.findAll();
-	    List<UserStatus> userStatus = userStatusRepository.findAll(); // Ensure you fetch user statuses
+		User item = userRepository.findById(id).orElse(null);
+		List<Role> roles = roleRepository.findAll();
+		List<UserStatus> userStatus = userStatusRepository.findAll(); // Ensure you fetch user statuses
 
-	    model.addAttribute("itemProd", item);
-	    model.addAttribute("roles", roles);
-	    model.addAttribute("userStatus", userStatus); // Add this line to pass userStatus
+		model.addAttribute("itemProd", item);
+		model.addAttribute("roles", roles);
+		model.addAttribute("userStatus", userStatus); // Add this line to pass userStatus
 
-	    req.setAttribute("view", "/admin/QuanLyKhachHang/edit.html");
-	    return "indexAdmin";
+		req.setAttribute("view", "/admin/QuanLyKhachHang/edit.html");
+		return "indexAdmin";
 	}
-
-
 
 	@PostMapping("/update/{usersId}")
 	public String update(HttpServletRequest req, @PathVariable("usersId") Integer usersId,
-	        @RequestParam("username") String username, @RequestParam("fullName") String fullName,
-	        @RequestParam("phone") String phone, @RequestParam("birthDate") String birthDateStr,
-	        @RequestParam("gender") Boolean gender, @RequestParam("email") String email,
-	        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-	        @RequestParam("roleId") int roleId, @RequestParam("statusId") int statusId, // New statusId parameter
-	        Model model) {
+			@RequestParam("username") String username, @RequestParam("fullName") String fullName,
+			@RequestParam("phone") String phone, @RequestParam("birthDate") String birthDateStr,
+			@RequestParam("gender") Boolean gender, @RequestParam("email") String email,
+			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+			@RequestParam("roleId") int roleId, @RequestParam("statusId") int statusId, // New statusId parameter
+			Model model) {
 
-	    User user = userRepository.findById(usersId).orElseThrow(() -> new RuntimeException("User not found"));
-	    Date birthDate = null;
-	    try {
-	        birthDate = new SimpleDateFormat("yyyy-MM-dd").parse(birthDateStr);
-	    } catch (ParseException e) {
-	        e.printStackTrace();
-	        req.setAttribute("error", "Invalid date format");
-	        return "errorPage";
-	    }
-	    user.setUsername(username); // Ensure the username is also set
-	    user.setFullName(fullName);
-	    user.setPhone(phone);
-	    user.setBirthDate(birthDate);
-	    user.setGender(gender);
-	    user.setEmail(email);
+		User user = userRepository.findById(usersId).orElseThrow(() -> new RuntimeException("User not found"));
+		Date birthDate = null;
+		try {
+			birthDate = new SimpleDateFormat("yyyy-MM-dd").parse(birthDateStr);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			req.setAttribute("error", "Invalid date format");
+			return "errorPage";
+		}
+		user.setUsername(username); // Ensure the username is also set
+		user.setFullName(fullName);
+		user.setPhone(phone);
+		user.setBirthDate(birthDate);
+		user.setGender(gender);
+		user.setEmail(email);
 
-	    // Handle profile image upload if provided
-	    if (profileImage != null && !profileImage.isEmpty()) {
-	        try {
-	            // Check file type
-	            if (!profileImage.getContentType().startsWith("image")) {
-	                req.setAttribute("error", "Only image files are allowed");
-	                return "errorPage";
-	            }
+		// Handle profile image upload if provided
+		if (profileImage != null && !profileImage.isEmpty()) {
+			try {
+				// Check file type
+				if (!profileImage.getContentType().startsWith("image")) {
+					req.setAttribute("error", "Only image files are allowed");
+					return "errorPage";
+				}
 
-	            // Define upload directory
-	            String uploadDir = "/Image_Users/";
-	            String realPath = req.getServletContext().getRealPath(uploadDir);
-	            Path path = Paths.get(realPath);
-	            if (Files.notExists(path)) {
-	                Files.createDirectories(path);
-	            }
+				// Define upload directory
+				String uploadDir = "/Image_Users/";
+				String realPath = req.getServletContext().getRealPath(uploadDir);
+				Path path = Paths.get(realPath);
+				if (Files.notExists(path)) {
+					Files.createDirectories(path);
+				}
 
-	            // Save image file to upload directory
-	            String fileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
-	            Path filePath = Paths.get(realPath, fileName);
-	            Files.copy(profileImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+				// Save image file to upload directory
+				String fileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
+				Path filePath = Paths.get(realPath, fileName);
+				Files.copy(profileImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-	            // Set the filename in the user object
-	            user.setProfileImage(fileName);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	            req.setAttribute("error", "Failed to upload image");
-	            return "errorPage";
-	        }
-	    }
+				// Set the filename in the user object
+				user.setProfileImage(fileName);
+			} catch (IOException e) {
+				e.printStackTrace();
+				req.setAttribute("error", "Failed to upload image");
+				return "errorPage";
+			}
+		}
 
-	    // Handle role update
-	    Role role = roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found"));
-	    user.setRoleId(role);
+		// Handle role update
+		Role role = roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found"));
+		user.setRoleId(role);
 
-	    // Handle status update
-	   UserStatus  status = userStatusRepository.findById(statusId).orElseThrow(() -> new RuntimeException("Status not found")); // Assuming you have a Status entity
-	    user.setStatusId(status); // Set the status for the user
+		// Handle status update
+		UserStatus status = userStatusRepository.findById(statusId)
+				.orElseThrow(() -> new RuntimeException("Status not found")); // Assuming you have a Status entity
+		user.setStatus(status); // Set the status for the user
 
-	    // Save updated user
-	    userRepository.save(user);
+		// Save updated user
+		userRepository.save(user);
 
-	    // Add success message
-	    model.addAttribute("successMessage", "Cập nhật người dùng thành công!");
+		// Add success message
+		model.addAttribute("successMessage", "Cập nhật người dùng thành công!");
 
-	    return "redirect:/admin/client/list";
+		return "redirect:/admin/client/list";
 	}
-
 
 	@GetMapping("/delete/{userId}")
 	public String deleteUser(@PathVariable(name = "userId") Integer userId, Model model,

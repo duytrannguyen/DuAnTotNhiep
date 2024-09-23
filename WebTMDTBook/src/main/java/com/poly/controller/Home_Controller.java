@@ -52,43 +52,44 @@ public class Home_Controller {
 
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginDTO loginDTO, RedirectAttributes redirectAttributes) {
-	    boolean result = userServiceImpl.login(loginDTO);
+		boolean result = userServiceImpl.login(loginDTO);
 
-	    if (result) {
-	        User user = userServiceImpl.getUserByUsername(loginDTO.getUsername());
+		if (result) {
+			User user = userServiceImpl.getUserByUsername(loginDTO.getUsername());
 
-	        if (user != null) {
-	            int statusId = user.getStatusId().getStatusId();
-	            switch (statusId) {
-	                case 1: // Hoạt động
-	                    redirectAttributes.addFlashAttribute("successMessage", "Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
-	                    return user.getRoleId().getRoleId() == 1 ? "redirect:/admin/baocaothongke/report" : "redirect:/home/index";
-	                case 2: // Không hoạt động
-	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn không hoạt động.");
-	                    break;
-	                case 3: // Chờ xử lý
-	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đang chờ xử lý.");
-	                    break;
-	                case 4: // Tạm đình chỉ
-	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đã bị tạm đình chỉ.");
-	                    break;
-	                case 5: // Cấm vĩnh viễn
-	                    redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đã bị cấm vĩnh viễn.");
-	                    break;
-	                default:
-	                    redirectAttributes.addFlashAttribute("errorMessage", "Trạng thái tài khoản không xác định.");
-	                    break;
-	            }
-	        } else {
-	            redirectAttributes.addFlashAttribute("errorMessage", "Người dùng không được tìm thấy.");
-	        }
-	    } else {
-	        redirectAttributes.addFlashAttribute("errorMessage", "Thông tin đăng nhập không hợp lệ.");
-	    }
+			if (user != null) {
+				int statusId = user.getStatus().getStatusId();
+				switch (statusId) {
+					case 1: // Hoạt động
+						redirectAttributes.addFlashAttribute("successMessage",
+								"Đăng nhập thành công! Chào mừng bạn, " + user.getFullName() + ".");
+						return user.getRoleId().getRoleId() == 1 ? "redirect:/admin/baocaothongke/report"
+								: "redirect:/home/index";
+					case 2: // Không hoạt động
+						redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn không hoạt động.");
+						break;
+					case 3: // Chờ xử lý
+						redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đang chờ xử lý.");
+						break;
+					case 4: // Tạm đình chỉ
+						redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đã bị tạm đình chỉ.");
+						break;
+					case 5: // Cấm vĩnh viễn
+						redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản của bạn đã bị cấm vĩnh viễn.");
+						break;
+					default:
+						redirectAttributes.addFlashAttribute("errorMessage", "Trạng thái tài khoản không xác định.");
+						break;
+				}
+			} else {
+				redirectAttributes.addFlashAttribute("errorMessage", "Người dùng không được tìm thấy.");
+			}
+		} else {
+			redirectAttributes.addFlashAttribute("errorMessage", "Thông tin đăng nhập không hợp lệ.");
+		}
 
-	    return "redirect:/home/login"; // Chuyển hướng đến trang đăng nhập
+		return "redirect:/home/login"; // Chuyển hướng đến trang đăng nhập
 	}
-
 
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
@@ -131,16 +132,16 @@ public class Home_Controller {
 	public String listProducts(Model model) {
 		int totalCustomers = userService.getTotalUsers();
 		int totalProducts = productService.getTotalProducts();
-//        Double totalAmount = invoiceService.getTotalAmount();
-//        Long totalDeliveredOrders = invoiceService.getTotalDeliveredOrders();
+		// Double totalAmount = invoiceService.getTotalAmount();
+		// Long totalDeliveredOrders = invoiceService.getTotalDeliveredOrders();
 
 		List<Product> products = productService.getAllProducts();
 		model.addAttribute("products", products);
 
 		model.addAttribute("totalCustomers", totalCustomers);
 		model.addAttribute("totalProducts", totalProducts);
-//        model.addAttribute("totalAmount", totalAmount);
-//        model.addAttribute("totalDeliveredOrders", totalDeliveredOrders);
+		// model.addAttribute("totalAmount", totalAmount);
+		// model.addAttribute("totalDeliveredOrders", totalDeliveredOrders);
 
 		return "admin/BaoCaoThongKe/Report";
 	}

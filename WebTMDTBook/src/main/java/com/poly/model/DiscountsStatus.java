@@ -30,6 +30,6 @@ public class DiscountsStatus {
     @Column(name = "status_name", nullable = false)
     private String statusName;
 
-    @OneToMany(mappedBy = "status")
-    private List<Discount> discounts;
+    // @OneToMany(mappedBy = "status")
+    // private List<Discount> discounts;
 }

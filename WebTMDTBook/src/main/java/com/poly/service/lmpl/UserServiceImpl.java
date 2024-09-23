@@ -17,19 +17,19 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
-    
+
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private RolesRepository rolesRepository;
-    
+
     @Autowired
     private PasswordEncoder encoder;
-    
+
     @Autowired
     private ModelMapper modelMapper;
-    
+
     @Autowired
     private SessionService sessionService;
 

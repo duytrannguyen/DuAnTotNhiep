@@ -99,7 +99,6 @@ public class Admin_ProductController {
 		req.setAttribute("view", "/admin/QuanLySanPham/Products.html");
 		return "indexAdmin";
 	}
-	
 
 	@RequestMapping("/form")
 	public String formProducts(Model model, HttpServletRequest req) {
@@ -119,212 +118,212 @@ public class Admin_ProductController {
 	}
 
 	@PostMapping("/create")
-	public String createProduct(Model model, HttpServletRequest req, 
-	                            @RequestParam("img") MultipartFile photo,
-	                            @RequestParam("productName") String productName, 
-	                            @RequestParam("price") String priceStr,
-	                            @RequestParam("discountPercentage") String discountPercentageStr,
-	                            @RequestParam("publishingYear") String publishingYearStr, 
-	                            @RequestParam("weight") String weight,
-	                            @RequestParam("size") String size, 
-	                            @RequestParam("numberOfPages") String numberOfPagesStr,
-	                            @RequestParam("language") String language, 
-	                            @RequestParam("author") String author,
-	                            @RequestParam("description") String description, 
-	                            @RequestParam("manufacturer") String manufacturer,
-	                            @RequestParam("postingDate") String postingDateStr,
-	                            @RequestParam(value = "quantity", required = false, defaultValue = "0") String quantityStr,
-	                            @RequestParam("categoryId") String categoryIdStr, 
-	                            @RequestParam("statusId") String statusIdStr,
-	                            RedirectAttributes redirectAttributes) {
+	public String createProduct(Model model, HttpServletRequest req,
+			@RequestParam("img") MultipartFile photo,
+			@RequestParam("productName") String productName,
+			@RequestParam("price") String priceStr,
+			@RequestParam("discountPercentage") String discountPercentageStr,
+			@RequestParam("publishingYear") String publishingYearStr,
+			@RequestParam("weight") String weight,
+			@RequestParam("size") String size,
+			@RequestParam("numberOfPages") String numberOfPagesStr,
+			@RequestParam("language") String language,
+			@RequestParam("author") String author,
+			@RequestParam("description") String description,
+			@RequestParam("manufacturer") String manufacturer,
+			@RequestParam("postingDate") String postingDateStr,
+			@RequestParam(value = "quantity", required = false, defaultValue = "0") String quantityStr,
+			@RequestParam("categoryId") String categoryIdStr,
+			@RequestParam("statusId") String statusIdStr,
+			RedirectAttributes redirectAttributes) {
 
-	    List<String> errors = new ArrayList<>();
+		List<String> errors = new ArrayList<>();
 
-	    // Validate required fields
-	    if (productName == null || productName.trim().isEmpty()) {
-	        errors.add("Tên sản phẩm là bắt buộc.");
-	    }
-	    if (priceStr == null || priceStr.trim().isEmpty()) {
-	        errors.add("Giá sản phẩm là bắt buộc.");
-	    }
-	    if (publishingYearStr == null || publishingYearStr.trim().isEmpty()) {
-	        errors.add("Năm xuất bản là bắt buộc.");
-	    }
-	    if (weight == null || weight.trim().isEmpty()) {
-	        errors.add("Trọng lượng là bắt buộc.");
-	    }
-	    if (size == null || size.trim().isEmpty()) {
-	        errors.add("Kích thước là bắt buộc.");
-	    }
-	    if (numberOfPagesStr == null || numberOfPagesStr.trim().isEmpty()) {
-	        errors.add("Số trang là bắt buộc.");
-	    }
-	    if (language == null || language.trim().isEmpty()) {
-	        errors.add("Ngôn ngữ là bắt buộc.");
-	    }
-	    if (author == null || author.trim().isEmpty()) {
-	        errors.add("Tác giả là bắt buộc.");
-	    }
-	    if (description == null || description.trim().isEmpty()) {
-	        errors.add("Mô tả là bắt buộc.");
-	    }
-	    if (manufacturer == null || manufacturer.trim().isEmpty()) {
-	        errors.add("Nhà sản xuất là bắt buộc.");
-	    }
-	    if (postingDateStr == null || postingDateStr.trim().isEmpty()) {
-	        errors.add("Ngày đăng bán là bắt buộc.");
-	    }
-	    if (categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
-	        errors.add("Mã danh mục là bắt buộc.");
-	    }
-	    if (statusIdStr == null || statusIdStr.trim().isEmpty()) {
-	        errors.add("Mã trạng thái là bắt buộc.");
-	    }
+		// Validate required fields
+		if (productName == null || productName.trim().isEmpty()) {
+			errors.add("Tên sản phẩm là bắt buộc.");
+		}
+		if (priceStr == null || priceStr.trim().isEmpty()) {
+			errors.add("Giá sản phẩm là bắt buộc.");
+		}
+		if (publishingYearStr == null || publishingYearStr.trim().isEmpty()) {
+			errors.add("Năm xuất bản là bắt buộc.");
+		}
+		if (weight == null || weight.trim().isEmpty()) {
+			errors.add("Trọng lượng là bắt buộc.");
+		}
+		if (size == null || size.trim().isEmpty()) {
+			errors.add("Kích thước là bắt buộc.");
+		}
+		if (numberOfPagesStr == null || numberOfPagesStr.trim().isEmpty()) {
+			errors.add("Số trang là bắt buộc.");
+		}
+		if (language == null || language.trim().isEmpty()) {
+			errors.add("Ngôn ngữ là bắt buộc.");
+		}
+		if (author == null || author.trim().isEmpty()) {
+			errors.add("Tác giả là bắt buộc.");
+		}
+		if (description == null || description.trim().isEmpty()) {
+			errors.add("Mô tả là bắt buộc.");
+		}
+		if (manufacturer == null || manufacturer.trim().isEmpty()) {
+			errors.add("Nhà sản xuất là bắt buộc.");
+		}
+		if (postingDateStr == null || postingDateStr.trim().isEmpty()) {
+			errors.add("Ngày đăng bán là bắt buộc.");
+		}
+		if (categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
+			errors.add("Mã danh mục là bắt buộc.");
+		}
+		if (statusIdStr == null || statusIdStr.trim().isEmpty()) {
+			errors.add("Mã trạng thái là bắt buộc.");
+		}
 
-	    // Validate price
-	    float price = 0;
-	    try {
-	        price = Float.parseFloat(priceStr);
-	        if (price <= 0) {
-	            errors.add("Giá phải lớn hơn 0.");
-	        }
-	    } catch (NumberFormatException e) {
-	        errors.add("Định dạng giá không hợp lệ.");
-	    }
-	    
-	    // Validate discountPercentage
-	    float discountPercentage = 0;
-	    try {
-	        discountPercentage = Float.parseFloat(discountPercentageStr);
-	        if (discountPercentage < 0) {
-	            errors.add("Phần trăm giảm giá không được âm.");
-	        }
-	    } catch (NumberFormatException e) {
-	        errors.add("Định dạng phần trăm giảm giá không hợp lệ.");
-	    }
+		// Validate price
+		float price = 0;
+		try {
+			price = Float.parseFloat(priceStr);
+			if (price <= 0) {
+				errors.add("Giá phải lớn hơn 0.");
+			}
+		} catch (NumberFormatException e) {
+			errors.add("Định dạng giá không hợp lệ.");
+		}
 
-	    // Validate publishingYear
-	    int publishingYear = 0;
-	    try {
-	        publishingYear = Integer.parseInt(publishingYearStr);
-	        if (publishingYear <= 0) {
-	            errors.add("Năm xuất bản phải là số nguyên dương.");
-	        }
-	    } catch (NumberFormatException e) {
-	        errors.add("Định dạng năm xuất bản không hợp lệ.");
-	    }
+		// Validate discountPercentage
+		float discountPercentage = 0;
+		try {
+			discountPercentage = Float.parseFloat(discountPercentageStr);
+			if (discountPercentage < 0) {
+				errors.add("Phần trăm giảm giá không được âm.");
+			}
+		} catch (NumberFormatException e) {
+			errors.add("Định dạng phần trăm giảm giá không hợp lệ.");
+		}
 
-	    // Validate numberOfPages
-	    int numberOfPages = 0;
-	    try {
-	        numberOfPages = Integer.parseInt(numberOfPagesStr);
-	        if (numberOfPages <= 0) {
-	            errors.add("Số trang phải là số nguyên dương.");
-	        }
-	    } catch (NumberFormatException e) {
-	        errors.add("Định dạng số trang không hợp lệ.");
-	    }
+		// Validate publishingYear
+		int publishingYear = 0;
+		try {
+			publishingYear = Integer.parseInt(publishingYearStr);
+			if (publishingYear <= 0) {
+				errors.add("Năm xuất bản phải là số nguyên dương.");
+			}
+		} catch (NumberFormatException e) {
+			errors.add("Định dạng năm xuất bản không hợp lệ.");
+		}
 
-	    // Validate categoryId
-	    int categoryId = 0;
-	    try {
-	        categoryId = Integer.parseInt(categoryIdStr);
-	    } catch (NumberFormatException e) {
-	        errors.add("Định dạng mã danh mục không hợp lệ.");
-	    }
+		// Validate numberOfPages
+		int numberOfPages = 0;
+		try {
+			numberOfPages = Integer.parseInt(numberOfPagesStr);
+			if (numberOfPages <= 0) {
+				errors.add("Số trang phải là số nguyên dương.");
+			}
+		} catch (NumberFormatException e) {
+			errors.add("Định dạng số trang không hợp lệ.");
+		}
 
-	    // Validate statusId
-	    int statusId = 0;
-	    try {
-	        statusId = Integer.parseInt(statusIdStr);
-	    } catch (NumberFormatException e) {
-	        errors.add("Định dạng mã trạng thái không hợp lệ.");
-	    }
+		// Validate categoryId
+		int categoryId = 0;
+		try {
+			categoryId = Integer.parseInt(categoryIdStr);
+		} catch (NumberFormatException e) {
+			errors.add("Định dạng mã danh mục không hợp lệ.");
+		}
 
-	    // Validate postingDate
-	    Date postingDate = null;
-	    try {
-	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	        postingDate = dateFormat.parse(postingDateStr);
-	    } catch (ParseException e) {
-	        errors.add("Định dạng ngày đăng bán không hợp lệ.");
-	    }
+		// Validate statusId
+		int statusId = 0;
+		try {
+			statusId = Integer.parseInt(statusIdStr);
+		} catch (NumberFormatException e) {
+			errors.add("Định dạng mã trạng thái không hợp lệ.");
+		}
 
-	    // Validate quantity
-	    int quantity = 0;
-	    try {
-	        quantity = Integer.parseInt(quantityStr);
-	        if (quantity < 0) {
-	            errors.add("Số lượng không được âm.");
-	        }
-	    } catch (NumberFormatException e) {
-	        errors.add("Định dạng số lượng không hợp lệ.");
-	    }
+		// Validate postingDate
+		Date postingDate = null;
+		try {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			postingDate = dateFormat.parse(postingDateStr);
+		} catch (ParseException e) {
+			errors.add("Định dạng ngày đăng bán không hợp lệ.");
+		}
 
-	 // Check if product with the same name already exists
-	    if (productService.existsByProductName(productName)) {
-	        errors.add("Sản phẩm với tên '" + productName + "' đã tồn tại trong hệ thống.");
-	    }
+		// Validate quantity
+		int quantity = 0;
+		try {
+			quantity = Integer.parseInt(quantityStr);
+			if (quantity < 0) {
+				errors.add("Số lượng không được âm.");
+			}
+		} catch (NumberFormatException e) {
+			errors.add("Định dạng số lượng không hợp lệ.");
+		}
 
-	    // Check for errors
-	    if (!errors.isEmpty()) {
-	        // Return to the creation page with the errors
-	        redirectAttributes.addFlashAttribute("errorMessage", String.join(", ", errors));
-	        return "redirect:/admin/products/create"; // Redirect back to the product creation page
-	    }
+		// Check if product with the same name already exists
+		if (productService.existsByProductName(productName)) {
+			errors.add("Sản phẩm với tên '" + productName + "' đã tồn tại trong hệ thống.");
+		}
 
-	    try {
-	        // Tìm đối tượng Category và Status theo mã
-	        Category category = categoryService.findByCategoryCode(categoryId);
-	        ProductStatus status = productStatusService.findByStatusId(statusId);
+		// Check for errors
+		if (!errors.isEmpty()) {
+			// Return to the creation page with the errors
+			redirectAttributes.addFlashAttribute("errorMessage", String.join(", ", errors));
+			return "redirect:/admin/products/create"; // Redirect back to the product creation page
+		}
 
-	        // Tạo đối tượng Product mới
-	        Product product = new Product();
-	        product.setProductName(productName);
-	        product.setPrice(price);
-	        product.setDiscountPercentage(discountPercentage);
-	        product.setPublishingYear(publishingYear);
-	        product.setWeight(weight);
-	        product.setSize(size);
-	        product.setNumberOfPages(numberOfPagesStr);
-	        product.setLanguage(language);
-	        product.setAuthor(author);
-	        product.setDescription(description);
-	        product.setManufacturer(manufacturer);
-	        product.setPostingDate(postingDate);
-	        product.setQuantity(quantity);
-	        product.setCategory(category);
-	        product.setStatus(status);
+		try {
+			// Tìm đối tượng Category và Status theo mã
+			Category category = categoryService.findByCategoryCode(categoryId);
+			ProductStatus status = productStatusService.findByStatusId(statusId);
 
-	        // Xử lý ảnh
-	        if (!photo.isEmpty()) {
-	            String fileName = photo.getOriginalFilename();
-	            String realPath = req.getServletContext().getRealPath("/Image_SP/" + fileName);
-	            Path path = Path.of(realPath);
-	            if (!Files.exists(path.getParent())) {
-	                Files.createDirectories(path.getParent());
-	            }
-	            File file = new File(realPath);
-	            photo.transferTo(file);
+			// Tạo đối tượng Product mới
+			Product product = new Product();
+			product.setProductName(productName);
+			product.setPrice(price);
+			product.setPercentDecrease(discountPercentage);
+			product.setYearManufacture(publishingYear);
+			// product.setWeight(weight);
+			product.setSize(size);
+			// product.setNumberOfPages(numberOfPagesStr);
+			// product.setLanguage(language);
+			// product.setAuthor(author);
+			product.setDescription(description);
+			// product.setManufacturer(manufacturer);
+			product.setPostingDate(postingDate);
+			product.setQuantity(quantity);
+			product.setCategory(category);
+			product.setStatus(status);
 
-	            // Tạo đối tượng Image mới và lưu thông tin ảnh vào cơ sở dữ liệu
-	            Image image = new Image();
-	            image.setImageName(fileName);
-	            imageService.saveImage(image);
-	            product.setImageId(image);
-	        }
+			// Xử lý ảnh
+			if (!photo.isEmpty()) {
+				String fileName = photo.getOriginalFilename();
+				String realPath = req.getServletContext().getRealPath("/Image_SP/" + fileName);
+				Path path = Path.of(realPath);
+				if (!Files.exists(path.getParent())) {
+					Files.createDirectories(path.getParent());
+				}
+				File file = new File(realPath);
+				photo.transferTo(file);
 
-	        // Lưu sản phẩm vào cơ sở dữ liệu
-	        productService.saveProduct(product);
-	        redirectAttributes.addFlashAttribute("successMessage", "Tạo sản phẩm thành công!");
+				// Tạo đối tượng Image mới và lưu thông tin ảnh vào cơ sở dữ liệu
+				Image image = new Image();
+				image.setImageName(fileName);
+				imageService.saveImage(image);
+				product.setImageId(image);
+			}
 
-	    } catch (Exception e) {
-	        errors.add("Đã xảy ra lỗi: " + e.getMessage());
-	        redirectAttributes.addFlashAttribute("errorMessage", String.join(", ", errors));
-	        return "redirect:/admin/products/create"; // Chuyển hướng về trang tạo sản phẩm
-	    }
+			// Lưu sản phẩm vào cơ sở dữ liệu
+			productService.saveProduct(product);
+			redirectAttributes.addFlashAttribute("successMessage", "Tạo sản phẩm thành công!");
 
-	    return "redirect:/admin/products/list"; // Chuyển hướng đến danh sách sản phẩm
+		} catch (Exception e) {
+			errors.add("Đã xảy ra lỗi: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("errorMessage", String.join(", ", errors));
+			return "redirect:/admin/products/create"; // Chuyển hướng về trang tạo sản phẩm
+		}
+
+		return "redirect:/admin/products/list"; // Chuyển hướng đến danh sách sản phẩm
 	}
 
 	@GetMapping("/edit/{productId}")
@@ -474,15 +473,15 @@ public class Admin_ProductController {
 			// Update product attributes
 			product.setProductName(productName);
 			product.setPrice(price);
-			product.setDiscountPercentage(discountPercentage);
-			product.setPublishingYear(publishingYear);
-			product.setWeight(weight);
+			// product.setDiscountPercentage(discountPercentage);
+			// product.setPublishingYear(publishingYear);
+			// product.setWeight(weight);
 			product.setSize(size);
-			product.setNumberOfPages(numberOfPagesStr);
-			product.setLanguage(language);
-			product.setAuthor(author);
+			// product.setNumberOfPages(numberOfPagesStr);
+			// product.setLanguage(language);
+			// product.setAuthor(author);
 			product.setDescription(description);
-			product.setManufacturer(manufacturer);
+			// product.setManufacturer(manufacturer);
 			product.setPostingDate(postingDate);
 			product.setQuantity(quantity);
 			product.setCategory(category);
