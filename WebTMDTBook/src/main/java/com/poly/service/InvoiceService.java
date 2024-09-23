@@ -1,26 +1,15 @@
 package com.poly.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.poly.model.Invoice;
 import java.util.List;
 
-import com.poly.model.Invoice;
-
 public interface InvoiceService {
-
-	List<Invoice> getAllInvoices();
-
-	//Khang
-	List<Invoice> searchInvoices(String searchQuery);
-
-	Long getTotalOrders();
-
-	Double getTotalAmount();
-
-	//Khang
-	Invoice findById(Integer id);
-
-	//Khang
-	List<Invoice> findByStatusName(String statusName);
-	
-	//Khang
-	void save(Invoice invoice);
+    Double getTotalAmount();
+    Long getTotalOrders();
+    Invoice findByInvoice(Integer invoiceId);
+    void save(Invoice invoice);
+    List<Invoice> getAllInvoices();
+    Page<Invoice> findInvoicesByStatusAndKey(String status, String key, Pageable pageable);
 }

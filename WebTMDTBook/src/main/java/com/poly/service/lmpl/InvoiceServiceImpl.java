@@ -1,7 +1,10 @@
 package com.poly.service.lmpl;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.poly.model.Invoice;
@@ -15,11 +18,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 	private InvoiceRepository invoiceRepository;
 
 	@Override
-	public List<Invoice> getAllInvoices() {
-		return invoiceRepository.findAllInvoicesWithDetails();
-	}
-
-	@Override
 	public Double getTotalAmount() {
 		return invoiceRepository.findTotalAmount();
 	}
@@ -30,31 +28,22 @@ public class InvoiceServiceImpl implements InvoiceService {
 	}
 
 	@Override
-	public List<Invoice> searchInvoices(String searchQuery) {
-		Integer invoiceId = null;
-		try {
-			invoiceId = Integer.parseInt(searchQuery);
-		} catch (NumberFormatException e) {
-			// Do nothing, invoiceId will be null
-		}
-		return invoiceRepository.findByInvoiceIdOrCartUserFullNameContaining(invoiceId, searchQuery);
+	public Invoice findByInvoice(Integer invoiceId) {
+		return invoiceRepository.findById(invoiceId).orElse(null);
 	}
 
-	//Khang
-	@Override
-	public Invoice findById(Integer id) {
-		return invoiceRepository.findById(id).orElse(null);
-	}
-
-	//Khang
-	@Override
-	public List<Invoice> findByStatusName(String statusName) {
-		return invoiceRepository.findByStatusStatusName(statusName);
-	}
-
-	//Khang
 	@Override
 	public void save(Invoice invoice) {
 		invoiceRepository.save(invoice);
+	}
+
+	@Override
+	public List<Invoice> getAllInvoices() {
+		return invoiceRepository.findAllInvoicesWithDetails();
+	}
+
+	@Override
+	public Page<Invoice> findInvoicesByStatusAndKey(String status, String key, Pageable pageable) {
+		return invoiceRepository.findByStatusAndKey(status, key, pageable);
 	}
 }
