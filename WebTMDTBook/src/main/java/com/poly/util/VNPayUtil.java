@@ -3,17 +3,17 @@ package com.poly.util;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.poly.config.VNPAYConfig;
+//import com.poly.config.VNPAYConfig;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
+//import java.util.stream.Collectors;
 import org.apache.commons.codec.binary.Hex;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+// import javax.crypto.Mac;
+// import javax.crypto.spec.SecretKeySpec;
 public class VNPayUtil {
 
     // Phương thức tạo chữ ký HMAC SHA-512
@@ -89,7 +89,7 @@ public class VNPayUtil {
         return queryUrl;
     }
     
-    private static VNPAYConfig vnpayConfig = new VNPAYConfig();
+   // private static VNPAYConfig vnpayConfig = new VNPAYConfig();
     // Phương thức xác thực chữ ký từ Map các tham số
     public static boolean validateSignature(Map<String, String> paramsMap, String secretKey) {
         try {

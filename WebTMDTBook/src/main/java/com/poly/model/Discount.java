@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -32,7 +33,7 @@ public class Discount {
 
 	@Column(nullable = false)
 	@NotNull(message = "{NotNull.vc.quantity}")
-	//@Min(value = 1, message = "{Min.vc.quantity}")
+	// @Min(value = 1, message = "{Min.vc.quantity}")
 	@Max(value = 100, message = "{Max.vc.quantity}")
 	Integer quantity;
 
@@ -44,7 +45,7 @@ public class Discount {
 	@Column(nullable = false)
 	@NotNull(message = "{NotNull.vc.startDate}")
 	@JsonFormat(pattern = "yyyy-MM-dd")
-	@Temporal(TemporalType.DATE) 
+	@Temporal(TemporalType.DATE)
 	Date startDate;
 
 	@Column(nullable = false)
@@ -52,24 +53,28 @@ public class Discount {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@Temporal(TemporalType.DATE)
 	Date endDate;
-	
+
 	@Column(nullable = false)
 	@NotNull(message = "{NotNull.vc.discountValue}")
 	@Min(value = 0, message = "{Min.vc.discountValue}")
 	Double discountValue;
-	
+
 	@Column(nullable = false)
 	@NotNull(message = "{NotNull.vc.minInvoiceAmount}")
 	@Min(value = 0, message = "{Min.vc.minInvoiceAmount}")
 	Double minInvoiceAmount;
-	
+
 	@Column(name = "status_id")
-     Integer statusId ; 
-	
+	Integer statusId;
+
 	@OneToMany(mappedBy = "discount")
-     List<DiscountDetail> DiscountDetail;
+	List<DiscountDetail> DiscountDetail;
+
 	public boolean isValid() {
 		return startDate != null && endDate != null && !startDate.after(endDate);
 	}
-	
+
+	// @ManyToOne
+	// @JoinColumn(name = "status_id", nullable = false)
+	// private DiscountsStatus status;
 }

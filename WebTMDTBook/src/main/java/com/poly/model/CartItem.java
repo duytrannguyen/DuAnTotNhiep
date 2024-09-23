@@ -25,28 +25,28 @@ import lombok.Setter;
 
 public class CartItem {
 
-	 @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "cart_item_id")
-	    private Integer cartItemId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "cart_item_id")
+	private Integer cartItemId;
 
-	    @Column(name = "quantity", nullable = false)
-	    private Integer quantity;
+	@Column(name = "quantity", nullable = false)
+	private Integer quantity;
 
-	    @ManyToOne(fetch = FetchType.LAZY)
-	    @JoinColumn(name = "product_id", nullable = false)
-	    private Product productId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "product_id", nullable = false)
+	private Product productId;
 
-	    @ManyToOne
-	    @JoinColumn(name = "cartId", referencedColumnName = "cartId", nullable = false)
-	    private ShoppingCart shoppingCart;
-	    
-//	    @Override
-//	    public String toString() {
-//	        return "CartItem{" +
-//	               "cartItemId=" + cartItemId +
-//	               ", quantity=" + quantity +
-//	               ", productId=" + (productId != null ? productId.getProductName() : "null") +
-//	               '}';
-//	    }
+	@ManyToOne
+	@JoinColumn(name = "cart_id", referencedColumnName = "cartId", nullable = false)
+	private ShoppingCart shoppingCart;
+
+	// @Override
+	// public String toString() {
+	// return "CartItem{" +
+	// "cartItemId=" + cartItemId +
+	// ", quantity=" + quantity +
+	// ", productId=" + (productId != null ? productId.getProductName() : "null") +
+	// '}';
+	// }
 }

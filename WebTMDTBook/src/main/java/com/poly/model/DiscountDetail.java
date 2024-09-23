@@ -2,7 +2,9 @@ package com.poly.model;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
+
+// import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,25 +27,25 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "DiscountDetail")
+@Table(name = "DiscountDetails")
 public class DiscountDetail {
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     Integer discount_detail_id;
+    @Column(name = "discount_detail_id")
+    Integer discount_detail_id;
 
     @ManyToOne
     @JoinColumn(name = "discount_id")
-     Discount discount;
+    Discount discount;
 
     @ManyToOne
     @JoinColumn(name = "users_id")
-     User user;
+    User user;
 
     @ManyToOne
     @JoinColumn(name = "invoice_id")
-     Invoice invoice;
+    Invoice invoice;
 
     @Temporal(TemporalType.DATE)
-     Date usedDate;
+    Date usedDate;
 }
-

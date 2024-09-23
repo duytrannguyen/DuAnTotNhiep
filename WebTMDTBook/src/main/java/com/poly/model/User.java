@@ -1,16 +1,13 @@
 
 package com.poly.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,16 +35,16 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int usersId;
 
-	@Column(nullable = false)
+	@Column(name = "username", length = 50)
 	private String username;
 
-	@Column(nullable = false)
+	@Column(name = "full_name")
 	private String fullName;
 
-	@Column(nullable = false)
+	@Column(name = "password")
 	private String password;
 
-	@Column(nullable = false)
+	@Column(name = "profile_image")
 	private String profileImage;
 
 	@Column(nullable = false)
@@ -55,32 +52,44 @@ public class User {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date birthDate;
 
-	@Column(nullable = false)
+	@Column(name = "gender")
 	private Boolean gender;
 
-	@Column(nullable = false)
+	@Column(name = "email")
 	private String email;
 
-	@Column(nullable = false)
+	@Column(name = "phone")
 	private String phone;
 
 	@ManyToOne
-	@JoinColumn(name = "roleId", nullable = false)
-	private Role roleId;
-	@ManyToOne
-	@JoinColumn(name = "statusId", nullable = false)
-	private UserStatus statusId;
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ShoppingCart> shoppingCarts = new ArrayList<>();
+	@JoinColumn(name = "role_id")
+	private Role role;
 
-	@OneToMany(mappedBy = "users_id", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-	private List<Address> addresses = new ArrayList<>();
+	@ManyToOne
+	@JoinColumn(name = "status_id")
+	private UserStatus status;
+
+	@OneToMany(mappedBy = "user")
+	private List<Seller> sellers;
+
+	@OneToMany(mappedBy = "user")
+	private List<Address> addresses;
+
+	@OneToMany(mappedBy = "user")
+	private List<ShoppingCart> shoppingCarts;
+
+	@OneToMany(mappedBy = "user")
+	private List<SaveInformation> savedInformation;
+
+	@OneToMany(mappedBy = "user")
+	private List<Invoice> invoices;
 
 	@Override
 	public String toString() {
 		return "User{address=" + addresses + "}";
 	}
+
 	@OneToMany(mappedBy = "user")
-    private List<DiscountDetail> DiscountDetail;
+	private List<DiscountDetail> DiscountDetail;
 
 }

@@ -13,8 +13,10 @@ import lombok.*;
 public class PaymentMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "payment_method_id")
     private Integer paymentMethodId;
 
     @Column(nullable = false)
     private String paymentMethodName;
+
 }

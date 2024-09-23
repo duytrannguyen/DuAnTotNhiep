@@ -5,12 +5,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.List;
 
 @Data
 @Entity
@@ -18,13 +20,16 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "Productstatus")
+@Table(name = "ProductStatus")
 public class ProductStatus {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(nullable = false)
+	@Column(name = "status_id")
 	private int statusId;
 
-	@Column(nullable = false)
+	@Column(name = "status_name", nullable = false)
 	private String statusName;
+
+	@OneToMany(mappedBy = "status")
+	private List<Product> products;
 }
