@@ -33,18 +33,19 @@ import lombok.Setter;
 public class Invoice {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "invoice_id")
 	private Integer invoiceId;
 
 	@Column(nullable = false)
 	private Double totalAmount;
 
 	@Column(nullable = false)
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date paymentDate;
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date paymentDate;
 
-//	@Column(nullable = false)
-//	private String paymentStatus;
+	// @Column(nullable = false)
+	// private String paymentStatus;
 
 	@ManyToOne
 	@JoinColumn(name = "users_id", nullable = false)
@@ -65,7 +66,9 @@ public class Invoice {
 	@ManyToOne
 	@JoinColumn(name = "discount_id", nullable = true)
 	private Discount discount;
-	
+
+	// @OneToMany(mappedBy = "invoice")
+	// List<DiscountDetail> DiscountDetail;
 	@OneToMany(mappedBy = "invoice")
-     List<DiscountDetail> DiscountDetail;
+	private List<InvoiceItem> invoiceItems;
 }

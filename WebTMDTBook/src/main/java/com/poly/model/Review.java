@@ -1,5 +1,6 @@
 package com.poly.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,8 +15,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Date;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -27,14 +26,21 @@ import java.util.Date;
 public class Review {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "review_id")
 	private int reviewId;
-	private String content;
+
+	@Column(name = "rating", nullable = false)
 	private int rating;
-	private Date reviewDate;
-	private String image;
+
+	@Column(name = "comment")
+	private String comment;
 
 	@ManyToOne
-	@JoinColumn(name = "productId")
-	private Product productId;
+	@JoinColumn(name = "product_id", nullable = false)
+	private Product product;
+
+	@ManyToOne
+	@JoinColumn(name = "users_id", nullable = false)
+	private User user;
 
 }

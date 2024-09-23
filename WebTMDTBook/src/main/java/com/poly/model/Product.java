@@ -1,23 +1,10 @@
 package com.poly.model;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import jakarta.persistence.*;
-import java.util.Date;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -32,7 +19,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @Table(name = "Products")
-//Khang
+// Khang
 @ToString(exclude = "invoiceItems")
 public class Product {
 	// ly
@@ -40,70 +27,66 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int productId;
 
-	@Column(nullable = false)
+	@Column(name = "product_name", nullable = false)
 	private String productName;
-	
-	@Column(nullable = false)
-	private float discountPercentage;
 
-	@Column(nullable = false)
+	@Column(name = "price", nullable = false)
 	private float price;
 
-//	@Column(nullable = false)
-//	private float discountPercentage;
-	
-	@Column(nullable = false)
-	private int publishingYear;
+	@Column(name = "year_manufacture")
+	private int yearManufacture;
 
-	@Column(nullable = false)
-	private String weight;
-
-	@Column(nullable = false)
+	@Column(name = "size")
 	private String size;
 
-	@Column(nullable = false)
-	private String NumberOfPages;
+	@Column(name = "material")
+	private String material;
 
-	@Column(nullable = false)
-	private String language;
-
-	@Column(nullable = false)
-	private String author;
-
-	@Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
+	@Column(name = "description")
 	private String description;
 
-	@Column(nullable = false)
-	private String manufacturer;
+	@Column(name = "place_production")
+	private String placeProduction;
 
 	@Column(nullable = false)
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date PostingDate;
 
-	@Column(nullable = false)
+	@Column(name = "quantity")
 	private int quantity;
 
+	@Column(name = "percent_decrease")
+	private float percentDecrease;
+
+	@Column(name = "warranty")
+	private String warranty;
+
+	@Column(name = "rating")
+	private float rating;
+
 	@ManyToOne
-	@JoinColumn(name = "categoryId", nullable = false)
+	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
 
 	@ManyToOne
-	@JoinColumn(name = "imageId", nullable = false)
-	private Image imageId;
-//<<<<<<< duy
+	@JoinColumn(name = "image_id", nullable = false)
+	private Image image;
 
 	@ManyToOne
-	@JoinColumn(name = "statusId", nullable = false)
+	@JoinColumn(name = "status_id", nullable = false)
 	private ProductStatus status;
 
-//=======
-	
-// 	@ManyToOne
-// 	@JoinColumn(name = "statusId", nullable = false)
-// 	private ProductStatus statusId;
-	
-//>>>>>>> ly
+	@ManyToOne
+	@JoinColumn(name = "seller_id", nullable = false)
+	private Seller seller;
+
+	@OneToMany(mappedBy = "product")
+	private List<Review> reviews;
+
+	@OneToMany(mappedBy = "product")
+	private List<CartItem> cartItems;
+
 	@OneToMany(mappedBy = "product")
 	private List<InvoiceItem> invoiceItems;
 }

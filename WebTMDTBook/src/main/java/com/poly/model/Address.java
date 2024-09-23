@@ -26,24 +26,28 @@ public class Address {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "address_id")
 	private Integer id;
-	@Column(nullable = false, length = 255)
+
+	@Column(name = "status")
+	private boolean status;
+
+	@Column(name = "street", nullable = false)
 	private String street;
 
 	@ManyToOne
-	@JoinColumn(name = "commune_id", nullable = false)
+	@JoinColumn(name = "commune_id")
 	private Commune commune;
 
 	@ManyToOne
-	@JoinColumn(name = "district_id", nullable = false)
+	@JoinColumn(name = "district_id")
 	private District district;
 
 	@ManyToOne
-	@JoinColumn(name = "province_id", nullable = false)
+	@JoinColumn(name = "province_id")
 	private Province province;
-	boolean status;
+
 	@ManyToOne
 	@JoinColumn(name = "users_id")
-	private User users_id;
+	private User user;
 
 	// Address.java
 	@Override

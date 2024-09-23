@@ -2,7 +2,6 @@ package com.poly.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,17 +20,16 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "Images")
-public class Image {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "image_id")
-	private Integer imageId;
+@Table(name = "DiscountTypesStatus")
+public class DiscountTypesStatus {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "status_id")
+    private int statusId;
 
-	@Column(name = "image_name", nullable = false)
-	private String imageName;
+    @Column(name = "status_name", nullable = false)
+    private String statusName;
 
-	@OneToMany(mappedBy = "image")
-	private List<Product> products;
-
+    @OneToMany(mappedBy = "status")
+    private List<DiscountType> discountTypes;
 }

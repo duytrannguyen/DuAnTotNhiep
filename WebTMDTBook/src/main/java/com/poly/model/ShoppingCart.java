@@ -26,10 +26,11 @@ import lombok.Setter;
 @Table(name = "Shoppingcarts")
 public class ShoppingCart {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cart_id")
     private Integer cartId;
-	
+
     @Column(nullable = false)
     private Integer quantity;
 
@@ -39,27 +40,18 @@ public class ShoppingCart {
     @Column(nullable = false)
     private Double finalPrice;
 
-    //Khang
+    // Khang
     @ManyToOne
-	@JoinColumn(name = "users_id", nullable = false)
-	private User user;
+    @JoinColumn(name = "users_id", nullable = false)
+    private User user;
 
-    //Khang
-	public String getUsername() {
-		return user.getUsername();
-	}
-    
-    //ly
+    // Khang
+    public String getUsername() {
+        return user.getUsername();
+    }
+
+    // ly
     @OneToMany(mappedBy = "shoppingCart")
     private List<CartItem> cartItems;
-    
-//    @Override
-//    public String toString() {
-//        return "ShoppingCart{" +
-//               "cartId=" + cartId +
-//               ", quantity=" + quantity +
-//               ", totalPrice=" + totalPrice +
-//               ", finalPrice=" + finalPrice +
-//               '}';
-//    }
+
 }

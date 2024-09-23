@@ -3,8 +3,6 @@ package com.poly.model;
 import java.util.Date;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -22,6 +20,7 @@ public class OrderStatus {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "status_id")
 	private Integer statusId;
 
 	@Column(nullable = false)

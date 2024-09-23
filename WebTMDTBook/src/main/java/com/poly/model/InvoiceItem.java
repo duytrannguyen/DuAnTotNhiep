@@ -23,24 +23,24 @@ import lombok.Setter;
 @Entity
 @Table(name = "Invoiceitems")
 public class InvoiceItem {
-	  @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "invoice_item_id")
-	    private Integer invoiceItemId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "invoice_item_id")
+	private Integer invoiceItemId;
 
-	    @Column(name = "quantity", nullable = false)
-	    private Integer quantity;
+	@Column(name = "quantity", nullable = false)
+	private Integer quantity;
 
-	    @ManyToOne(fetch = FetchType.LAZY)
-	    @JoinColumn(name = "invoice_id", nullable = false)
-	    private Invoice invoice;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "invoice_id", nullable = false)
+	private Invoice invoice;
 
-	    @ManyToOne(fetch = FetchType.LAZY)
-	    @JoinColumn(name = "product_id", nullable = false)
-	    private Product product;
-	    
-	    //ly
-	    @Column(nullable = false)
-		private double price;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "product_id", nullable = false)
+	private Product product;
+
+	// ly
+	@Column(nullable = false)
+	private double price;
 
 }

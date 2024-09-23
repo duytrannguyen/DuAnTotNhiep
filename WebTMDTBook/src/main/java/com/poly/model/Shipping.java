@@ -20,6 +20,7 @@ public class Shipping {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "shipping_id")
 	private int shipping_id;
 
 	private String tracking_code;
@@ -34,9 +35,6 @@ public class Shipping {
 	private String recipient_address;
 
 	@Column(nullable = false)
-	private String status;
-
-	@Column(nullable = false)
 	@Temporal(TemporalType.DATE)
 	private Date shipping_date;
 
@@ -46,4 +44,8 @@ public class Shipping {
 
 	@Column(nullable = false)
 	private float COD;
+
+	@ManyToOne
+	@JoinColumn(name = "status_id", nullable = false)
+	private ShippingsStatus status;
 }
