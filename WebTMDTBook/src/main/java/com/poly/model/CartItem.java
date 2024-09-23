@@ -38,7 +38,7 @@ public class CartItem {
 	private Product productId;
 
 	@ManyToOne
-	@JoinColumn(name = "cart_id", referencedColumnName = "cartId", nullable = false)
+	@JoinColumn(name = "cart_id", referencedColumnName = "cart_id", nullable = false)
 	private ShoppingCart shoppingCart;
 
 	// @Override

@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
-	 @Query("SELECT c FROM Category c WHERE c.statusId.statusId = 1")
-	    List<Category> findAllCategoriesStatusId1();
+	// @Query("SELECT c FROM Category c WHERE c.statusId.statusId = 1")
+	// List<Category> findAllCategoriesStatusId1();
 }

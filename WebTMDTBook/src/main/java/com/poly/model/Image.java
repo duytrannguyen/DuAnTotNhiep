@@ -31,7 +31,7 @@ public class Image {
 	@Column(name = "image_name", nullable = false)
 	private String imageName;
 
-	@OneToMany(mappedBy = "image")
+	@OneToMany(mappedBy = "imageId")
 	private List<Product> products;
 
 }

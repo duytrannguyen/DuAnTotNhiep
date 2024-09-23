@@ -147,7 +147,7 @@ public class Client_PayController {
 		if (user == null) {
 			return "redirect:/home/login"; // Chuyển hướng đến trang đăng nhập nếu người dùng chưa đăng nhập
 		}
-////		// Tìm giỏ hàng hiện tại của người dùng
+		//// // Tìm giỏ hàng hiện tại của người dùng
 		ShoppingCart shoppingCart = shoppingCartRepository.findByUser(user);
 		if (shoppingCart == null) {
 			// Nếu không tìm thấy giỏ hàng, tạo mới một giỏ hàng
@@ -198,7 +198,8 @@ public class Client_PayController {
 
 	@PostMapping("/products/details/cart/pay")
 	public String pay(@ModelAttribute("invoice") Invoice invoice, @RequestParam("status") Integer status,
-			@RequestParam("productName") String productName, @RequestParam("payment_method_id") Integer payment_method_id,
+			@RequestParam("productName") String productName,
+			@RequestParam("payment_method_id") Integer payment_method_id,
 			@RequestParam("shipping_id") Integer shippingId, @RequestParam(name = "totalAmount") double totalAmount,
 			@RequestParam(name = "quantity") int quantity, @RequestParam(name = "price") double price,
 			HttpSession session, HttpServletRequest request, Model model, HttpServletResponse httpServletResponse)
@@ -234,50 +235,50 @@ public class Client_PayController {
 			// Tạo URL yêu cầu thanh toán VNPay
 			String queryUrl = VNPayUtil.getPaymentURL(vnpParamsMap, vnPayConfig.getSecretKey());
 			String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
-			System.out.println("orderId "+invoice.getInvoiceId());
+			System.out.println("orderId " + invoice.getInvoiceId());
 			System.out.println("URL yêu cầu VNPay: " + paymentUrl);
 			// Lưu hóa đơn vào session để sử dụng sau khi thanh toán thành công
 			session.setAttribute("invoice", invoice);
 			session.setAttribute("cartItems", sessionService.get("cartItems"));
 			return "redirect:" + paymentUrl;
-		} 
+		}
 		if (payment_method_id == 3) {
-		    // Tạo đối tượng yêu cầu thanh toán
-		    final String returnUrl = "http://localhost:8080/success";
-		    final String cancelUrl = "http://localhost:8080/cancel";
-		    String currentTimeString = String.valueOf(new Date().getTime());
-		    long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
-		    final String description = user.getUsername()+ " " + orderCode;
-//		    System.out.println(orderCode);
-		    ItemData item = ItemData.builder()
-		            .name(productName)
-		            .quantity(quantity)
-		            .price((int) price)
-		            .build();
-		    PaymentData paymentData = PaymentData.builder()
-		            .orderCode(orderCode)
-		            .amount((int) totalAmount)
-		            .description(description)
-		            .returnUrl(returnUrl)
-		            .cancelUrl(cancelUrl)
-		            .item(item)
-		            .build();
-		    
-		    try {
-		        // Tạo liên kết thanh toán với PayOS
-		        CheckoutResponseData responseData = payOS.createPaymentLink(paymentData);
-		        String checkoutUrl = responseData.getCheckoutUrl();
-		        
-		        // Lưu thông tin hóa đơn vào cơ sở dữ liệu và session
-		        session.setAttribute("invoice", invoice);
-		        session.setAttribute("cartItems", session.getAttribute("cartItems"));
-		        // Chuyển hướng đến trang thanh toán
-		        return "redirect:" + checkoutUrl;
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		        // Xử lý lỗi
-		        return "redirect:/error";
-		    }
+			// Tạo đối tượng yêu cầu thanh toán
+			final String returnUrl = "http://localhost:8080/success";
+			final String cancelUrl = "http://localhost:8080/cancel";
+			String currentTimeString = String.valueOf(new Date().getTime());
+			long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
+			final String description = user.getUsername() + " " + orderCode;
+			// System.out.println(orderCode);
+			ItemData item = ItemData.builder()
+					.name(productName)
+					.quantity(quantity)
+					.price((int) price)
+					.build();
+			PaymentData paymentData = PaymentData.builder()
+					.orderCode(orderCode)
+					.amount((int) totalAmount)
+					.description(description)
+					.returnUrl(returnUrl)
+					.cancelUrl(cancelUrl)
+					.item(item)
+					.build();
+
+			try {
+				// Tạo liên kết thanh toán với PayOS
+				CheckoutResponseData responseData = payOS.createPaymentLink(paymentData);
+				String checkoutUrl = responseData.getCheckoutUrl();
+
+				// Lưu thông tin hóa đơn vào cơ sở dữ liệu và session
+				session.setAttribute("invoice", invoice);
+				session.setAttribute("cartItems", session.getAttribute("cartItems"));
+				// Chuyển hướng đến trang thanh toán
+				return "redirect:" + checkoutUrl;
+			} catch (Exception e) {
+				e.printStackTrace();
+				// Xử lý lỗi
+				return "redirect:/error";
+			}
 		}
 
 		// Lưu hóa đơn vào cơ sở dữ liệu cho các phương thức thanh toán khác
@@ -291,7 +292,7 @@ public class Client_PayController {
 
 		return "/client/PaySuccess";
 	}
-	
+
 	private void saveInvoiceItems(HttpSession session, Invoice invoice) {
 		// Chuyển đổi các mục giỏ hàng thành các mục hóa đơn
 		List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
@@ -312,7 +313,8 @@ public class Client_PayController {
 			}
 		}
 	}
-//vnpay
+
+	// vnpay
 	@GetMapping("/response")
 	public String handleVNPayResponse(@RequestParam Map<String, String> params, HttpSession session,
 			HttpServletRequest request, Model model) {
@@ -345,7 +347,7 @@ public class Client_PayController {
 				return "/client/PaySuccess";
 			} else {
 				// Handle failed payment
-//				model.addAttribute("errorCode", vnpResponseCode);
+				// model.addAttribute("errorCode", vnpResponseCode);
 				model.addAttribute("errorMessage", "Thanh toán không thành công do đã hủy thanh toán!!");
 				return "/client/PaymentFailed";
 			}
@@ -357,9 +359,10 @@ public class Client_PayController {
 		}
 	}
 
-	//payos
+	// payos
 	@RequestMapping("/success")
-	public String handlePaymentSuccess(HttpServletRequest request, HttpServletResponse response,HttpSession session,Model model) {
+	public String handlePaymentSuccess(HttpServletRequest request, HttpServletResponse response, HttpSession session,
+			Model model) {
 		// Lấy hóa đơn và các mục giỏ hàng từ session
 		Invoice invoice = (Invoice) session.getAttribute("invoice");
 		if (invoice != null) {
@@ -376,10 +379,10 @@ public class Client_PayController {
 	}
 
 	@RequestMapping("/cancel")
-	public String handlePaymentCancel(HttpServletRequest request,Model model) {
+	public String handlePaymentCancel(HttpServletRequest request, Model model) {
 		model.addAttribute("errorMessage", "Đã hủy thanh toán!!");
-	    // Xử lý khi thanh toán bị hủy
-	    return "/client/PaymentFailed"; // Trang thông báo hủy
+		// Xử lý khi thanh toán bị hủy
+		return "/client/PaymentFailed"; // Trang thông báo hủy
 	}
 
 	@PostMapping("/apply-discount")

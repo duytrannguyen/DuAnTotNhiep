@@ -63,7 +63,7 @@ public class User {
 
 	@ManyToOne
 	@JoinColumn(name = "role_id")
-	private Role role;
+	private Role roleId;
 
 	@ManyToOne
 	@JoinColumn(name = "status_id")

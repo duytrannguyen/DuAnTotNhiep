@@ -57,18 +57,18 @@ public class Client_HomeController {
 	@Autowired
 	CategoryService categoryService;
 
-// <<<<<<< duy
-// =======
-// //	@GetMapping("/index")
-// //	public String home(Model model) {
-// //		List<Product> products = productService.getAllProducts();
-// //		model.addAttribute("products", products);
-// //		List<Category> categories = categoryService.getAllCategory();
-// //		model.addAttribute("categories", categories);
-// //		return "indexClient";
-// //	}
-	
-// >>>>>>> update_Code
+	// <<<<<<< duy
+	// =======
+	// // @GetMapping("/index")
+	// // public String home(Model model) {
+	// // List<Product> products = productService.getAllProducts();
+	// // model.addAttribute("products", products);
+	// // List<Category> categories = categoryService.getAllCategory();
+	// // model.addAttribute("categories", categories);
+	// // return "indexClient";
+	// // }
+
+	// >>>>>>> update_Code
 	@GetMapping("/index")
 	public String home(Model model) {
 		List<Product> products = productService.getAllProducts(); // Lấy tất cả sản phẩm
@@ -93,14 +93,15 @@ public class Client_HomeController {
 		model.addAttribute("currentProducts", currentProducts);
 		model.addAttribute("upcomingProducts", upcomingProducts);
 		// Chỉ lấy danh mục loại sàn phẩm ở trạng thấy On
-		List<Category> categories = categoryRepository.findAllCategoriesStatusId1();
-		model.addAttribute("categories", categories); // Thêm danh sách danh mục vào mô hình
+		// List<Category> categories = categoryRepository.findAllCategoriesStatusId1();
+		// model.addAttribute("categories", categories); // Thêm danh sách danh mục vào
+		// mô hình
 
 		return "indexClient"; // Trả về view indexClient
 	}
 
 	@GetMapping("/products")
-// <<<<<<< khagdn
+	// <<<<<<< khagdn
 	public String products(Model model, @RequestParam(name = "keyName", required = false) String keyName,
 			@RequestParam("pageNo") Optional<Integer> pageNo,
 			@RequestParam(name = "categoryId", required = false) Integer categoryId,
@@ -130,7 +131,7 @@ public class Client_HomeController {
 		List<Double> discountedPrices = new ArrayList<>();
 		for (Product product : products) {
 			double discountedPrice = product.getPrice()
-					- ((product.getPrice() * product.getDiscountPercentage()) / 100);
+					- ((product.getPrice() * product.getPercentDecrease()) / 100);
 			discountedPrices.add(discountedPrice);
 		}
 
@@ -144,55 +145,57 @@ public class Client_HomeController {
 
 		return "client/Product";
 	}
-// =======
-	public String products(Model model, 
-	                       @RequestParam(name = "keyName", required = false) String keyName,
-	                       @RequestParam("pageNo") Optional<Integer> pageNo,
-	                       @RequestParam(name = "categoryId", required = false) Integer categoryId) {
 
-	    int pageSize = 6; // Số sản phẩm trên mỗi trang
-	    Sort sort = Sort.by(Sort.Direction.DESC, "productId");
-	    Pageable pageable = PageRequest.of(pageNo.orElse(0), pageSize, sort);
+	// =======
+	public String products(Model model,
+			@RequestParam(name = "keyName", required = false) String keyName,
+			@RequestParam("pageNo") Optional<Integer> pageNo,
+			@RequestParam(name = "categoryId", required = false) Integer categoryId) {
 
-	    Page<Product> page;
-	    if (StringUtils.hasText(keyName)) {
-	        page = productRepository.findByProductNameContaining(keyName, pageable);
-	    } else if (categoryId != null) {
-	        page = productRepository.findProductsByCategory(categoryId, pageable);
-	    } else {
-	        page = productRepository.findAll(pageable);
-	    }
+		int pageSize = 6; // Số sản phẩm trên mỗi trang
+		Sort sort = Sort.by(Sort.Direction.DESC, "productId");
+		Pageable pageable = PageRequest.of(pageNo.orElse(0), pageSize, sort);
 
-	    int totalPages = page.getTotalPages(); // Tổng số trang
-	    int currentPage = pageNo.orElse(0); // Trang hiện tại
+		Page<Product> page;
+		if (StringUtils.hasText(keyName)) {
+			page = productRepository.findByProductNameContaining(keyName, pageable);
+		} else if (categoryId != null) {
+			page = productRepository.findProductsByCategory(categoryId, pageable);
+		} else {
+			page = productRepository.findAll(pageable);
+		}
 
-	    List<Product> products = page.getContent();
-	    List<Category> categories = categoryRepository.findAll(Sort.by(Sort.Direction.DESC, "categoryId"));
+		int totalPages = page.getTotalPages(); // Tổng số trang
+		int currentPage = pageNo.orElse(0); // Trang hiện tại
 
-	    List<Double> discountedPrices = new ArrayList<>();
-	    for (Product product : products) {
-	        double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
-	        discountedPrices.add(discountedPrice);
-	    }
-	    
-	    if (products.isEmpty()) {
-	        model.addAttribute("noProductsFound", true);
-	    } else {
-	        model.addAttribute("products", products);
-	    }
+		List<Product> products = page.getContent();
+		List<Category> categories = categoryRepository.findAll(Sort.by(Sort.Direction.DESC, "categoryId"));
 
-	    model.addAttribute("categories", categories);
-	    model.addAttribute("totalPageProduct", totalPages);
-	    model.addAttribute("pageProduct", page);
-	    model.addAttribute("pageClick", currentPage);
-	    model.addAttribute("products", products);
-	    model.addAttribute("discountedPrices", discountedPrices);
-	    model.addAttribute("selectedCategoryId", categoryId);
+		List<Double> discountedPrices = new ArrayList<>();
+		for (Product product : products) {
+			double discountedPrice = product.getPrice()
+					- ((product.getPrice() * product.getPercentDecrease()) / 100);
+			discountedPrices.add(discountedPrice);
+		}
 
-	    return "client/Product";
+		if (products.isEmpty()) {
+			model.addAttribute("noProductsFound", true);
+		} else {
+			model.addAttribute("products", products);
+		}
+
+		model.addAttribute("categories", categories);
+		model.addAttribute("totalPageProduct", totalPages);
+		model.addAttribute("pageProduct", page);
+		model.addAttribute("pageClick", currentPage);
+		model.addAttribute("products", products);
+		model.addAttribute("discountedPrices", discountedPrices);
+		model.addAttribute("selectedCategoryId", categoryId);
+
+		return "client/Product";
 	}
-	
-// >>>>>>> update_Code
+
+	// >>>>>>> update_Code
 
 	@PostMapping("/products")
 	public String priceProducts(Model model, @RequestParam("pageNo") Optional<Integer> pageNo,
@@ -223,18 +226,19 @@ public class Client_HomeController {
 
 		List<Product> products = page.getContent();
 		List<Category> categories = categoryRepository.findAll(Sort.by(Direction.DESC, "categoryId"));
-		
+
 		List<Double> discountedPrices = new ArrayList<>();
-	    for (Product product : products) {
-	        double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
-	        discountedPrices.add(discountedPrice);
-	    }
-	    
-	    if (products.isEmpty()) {
-	        model.addAttribute("noProductsFound", true);
-	    } else {
-	        model.addAttribute("products", products);
-	    }
+		for (Product product : products) {
+			double discountedPrice = product.getPrice()
+					- ((product.getPrice() * product.getPercentDecrease()) / 100);
+			discountedPrices.add(discountedPrice);
+		}
+
+		if (products.isEmpty()) {
+			model.addAttribute("noProductsFound", true);
+		} else {
+			model.addAttribute("products", products);
+		}
 
 		model.addAttribute("categories", categories);
 		model.addAttribute("totalPageProduct", totalPages);
@@ -246,111 +250,112 @@ public class Client_HomeController {
 
 		return "client/Product";
 	}
-// <<<<<<< khagdn
+	// <<<<<<< khagdn
 
-// 	@GetMapping("/products/details/{productId}")
-// 	public String productDetails(Model model, @PathVariable("productId") Integer productId,
-// 			@RequestParam("pageNo") Optional<Integer> pageNo) {
-// =======
-	
-	
+	// @GetMapping("/products/details/{productId}")
+	// public String productDetails(Model model, @PathVariable("productId") Integer
+	// productId,
+	// @RequestParam("pageNo") Optional<Integer> pageNo) {
+	// =======
+
 	@GetMapping("/products/details/{productId}")
 	public String productDetails(Model model, @PathVariable("productId") Integer productId,
-	                             @RequestParam("pageNo") Optional<Integer> pageNo) {
+			@RequestParam("pageNo") Optional<Integer> pageNo) {
 
-	    try {
-	        // Lấy sản phẩm chi tiết
-	        Product product = productRepository.findById(productId)
-	                .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
-	        model.addAttribute("product", product);
+		try {
+			// Lấy sản phẩm chi tiết
+			Product product = productRepository.findById(productId)
+					.orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
+			model.addAttribute("product", product);
 
-	        // Tính giá sau khi giảm
-	       
-	            double discountedPrice = product.getPrice() - ((product.getPrice() * product.getDiscountPercentage()) / 100);
-	            model.addAttribute("discountedPrice", discountedPrice);
-	                   
+			// Tính giá sau khi giảm
 
-	        // Phân trang danh sách sản phẩm
-	        Sort sort = Sort.by(Sort.Direction.DESC, "productId");
-	        Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
-	        Page<Product> page = productRepository.findAll(pageable);
+			double discountedPrice = product.getPrice()
+					- ((product.getPrice() * product.getPercentDecrease()) / 100);
+			model.addAttribute("discountedPrice", discountedPrice);
 
-	        List<Integer> totalPages = new ArrayList<>();
-	        for (int i = 0; i < page.getTotalPages(); i++) {
-	            totalPages.add(i + 1);
-	        }
+			// Phân trang danh sách sản phẩm
+			Sort sort = Sort.by(Sort.Direction.DESC, "productId");
+			Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
+			Page<Product> page = productRepository.findAll(pageable);
 
-	        List<Product> products = page.getContent();
-	        
-	        List<Double> discountedPrices = new ArrayList<>();
-		    for (Product productss : products) {
-		        double discountedPrice1 = productss.getPrice() - ((productss.getPrice() * productss.getDiscountPercentage()) / 100);
-		        discountedPrices.add(discountedPrice1);
-		    }
+			List<Integer> totalPages = new ArrayList<>();
+			for (int i = 0; i < page.getTotalPages(); i++) {
+				totalPages.add(i + 1);
+			}
 
+			List<Product> products = page.getContent();
 
-	        model.addAttribute("totalPageProduct", totalPages);
-	        model.addAttribute("pageProduct", page);
-	        model.addAttribute("pageClick", pageNo.orElse(0));
-	        model.addAttribute("products", products);
-	        model.addAttribute("discountedPrices", discountedPrices);
+			List<Double> discountedPrices = new ArrayList<>();
+			for (Product productss : products) {
+				double discountedPrice1 = productss.getPrice()
+						- ((productss.getPrice() * productss.getPercentDecrease()) / 100);
+				discountedPrices.add(discountedPrice1);
+			}
 
-	        return "client/ProductDetails";
-	        
-	    } catch (Exception e) {
-	        // Ghi log lỗi
-	        e.printStackTrace();
-	        return "error"; // Trả về trang lỗi nếu xảy ra ngoại lệ
-	    }
+			model.addAttribute("totalPageProduct", totalPages);
+			model.addAttribute("pageProduct", page);
+			model.addAttribute("pageClick", pageNo.orElse(0));
+			model.addAttribute("products", products);
+			model.addAttribute("discountedPrices", discountedPrices);
+
+			return "client/ProductDetails";
+
+		} catch (Exception e) {
+			// Ghi log lỗi
+			e.printStackTrace();
+			return "error"; // Trả về trang lỗi nếu xảy ra ngoại lệ
+		}
 	}
-//>>>>>>> update_Code
+	// >>>>>>> update_Code
 
-//		try {
-//			// Lấy sản phẩm chi tiết
-//			Product product = productRepository.findById(productId)
-//					.orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
-//			model.addAttribute("product", product);
-//
-//			// Tính giá sau khi giảm
-//
-//			double discountedPrice = product.getPrice()
-//					- ((product.getPrice() * product.getDiscountPercentage()) / 100);
-//			model.addAttribute("discountedPrice", discountedPrice);
-//
-//			// Phân trang danh sách sản phẩm
-//			Sort sort = Sort.by(Sort.Direction.DESC, "productId");
-//			Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
-//			Page<Product> page = productRepository.findAll(pageable);
-//
-//			List<Integer> totalPages = new ArrayList<>();
-//			for (int i = 0; i < page.getTotalPages(); i++) {
-//				totalPages.add(i + 1);
-//			}
-//
-//			List<Product> products = page.getContent();
-//
-//			model.addAttribute("totalPageProduct", totalPages);
-//			model.addAttribute("pageProduct", page);
-//			model.addAttribute("pageClick", pageNo.orElse(0));
-//			model.addAttribute("products", products);
-//
-//			return "client/ProductDetails";
-//
-//		} catch (Exception e) {
-//			// Ghi log lỗi
-//			e.printStackTrace();
-//			return "error"; // Trả về trang lỗi nếu xảy ra ngoại lệ
-//		}
-	
+	// try {
+	// // Lấy sản phẩm chi tiết
+	// Product product = productRepository.findById(productId)
+	// .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" +
+	// productId));
+	// model.addAttribute("product", product);
+	//
+	// // Tính giá sau khi giảm
+	//
+	// double discountedPrice = product.getPrice()
+	// - ((product.getPrice() * product.getDiscountPercentage()) / 100);
+	// model.addAttribute("discountedPrice", discountedPrice);
+	//
+	// // Phân trang danh sách sản phẩm
+	// Sort sort = Sort.by(Sort.Direction.DESC, "productId");
+	// Pageable pageable = PageRequest.of(pageNo.orElse(0), 4, sort);
+	// Page<Product> page = productRepository.findAll(pageable);
+	//
+	// List<Integer> totalPages = new ArrayList<>();
+	// for (int i = 0; i < page.getTotalPages(); i++) {
+	// totalPages.add(i + 1);
+	// }
+	//
+	// List<Product> products = page.getContent();
+	//
+	// model.addAttribute("totalPageProduct", totalPages);
+	// model.addAttribute("pageProduct", page);
+	// model.addAttribute("pageClick", pageNo.orElse(0));
+	// model.addAttribute("products", products);
+	//
+	// return "client/ProductDetails";
+	//
+	// } catch (Exception e) {
+	// // Ghi log lỗi
+	// e.printStackTrace();
+	// return "error"; // Trả về trang lỗi nếu xảy ra ngoại lệ
+	// }
 
-//	@GetMapping("products/details/cart")
-//	public String Cart(Model model) {
-//
-//		List<CartItem> cartItemts = cartItemRepository.findAll(Sort.by(Direction.DESC, "cartItemId"));
-//		model.addAttribute("cartItemts", cartItemts);
-//
-//		return "client/Cart";
-//	}
+	// @GetMapping("products/details/cart")
+	// public String Cart(Model model) {
+	//
+	// List<CartItem> cartItemts =
+	// cartItemRepository.findAll(Sort.by(Direction.DESC, "cartItemId"));
+	// model.addAttribute("cartItemts", cartItemts);
+	//
+	// return "client/Cart";
+	// }
 
 	@GetMapping("/products/details/cart/pay")
 	public String Pay() {
@@ -369,10 +374,10 @@ public class Client_HomeController {
 
 	@GetMapping("/history")
 	public String History(Model model) {
-	    List<Invoice> invoices = invoiceService.getAllInvoices();
-	    invoices.sort((i1, i2) -> i2.getInvoiceId().compareTo(i1.getInvoiceId()));
-	    model.addAttribute("invoices", invoices);
-	    return "client/History";
+		List<Invoice> invoices = invoiceService.getAllInvoices();
+		invoices.sort((i1, i2) -> i2.getInvoiceId().compareTo(i1.getInvoiceId()));
+		model.addAttribute("invoices", invoices);
+		return "client/History";
 	}
 
 }
