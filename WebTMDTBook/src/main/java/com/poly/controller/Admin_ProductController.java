@@ -33,6 +33,8 @@ import com.poly.model.Category;
 import com.poly.model.Image;
 import com.poly.model.Product;
 import com.poly.model.ProductStatus;
+import com.poly.model.Seller;
+import com.poly.model.User;
 import com.poly.repository.CategoryRepository;
 import com.poly.repository.ImageRepository;
 import com.poly.repository.ProductRepository;
@@ -77,10 +79,31 @@ public class Admin_ProductController {
 	public String listProducts(Model model, HttpServletRequest req,
 			@RequestParam(name = "pageNo", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "10") int size) {
-		// Sắp xếp theo ID giảm dần
+
+		// Lấy thông tin người dùng từ session
+		String username = req.getUserPrincipal().getName();
+		User user = userRepository.findByUsername(username);
+
+		// Kiểm tra xem user có null hay không
+		if (user == null) {
+			return "redirect:/login"; // Hoặc trang lỗi
+		}
+
+		// Lấy danh sách seller từ thông tin người dùng
+		List<Seller> sellers = user.getSellers(); // Lấy danh sách Seller từ User
+
+		// Kiểm tra xem seller có tồn tại không
+		if (sellers == null || sellers.isEmpty()) {
+			return "redirect:/error seller"; // Hoặc trang lỗi
+		}
+		// Giả sử bạn chỉ muốn làm việc với seller đầu tiên trong danh sách
+		Seller seller = sellers.get(0); // Lấy seller đầu tiên
+
+		// Sắp xếp theo ID sản phẩm giảm dần
 		Pageable pageable = PageRequest.of(page, size, Sort.by("productId").descending());
 
-		Page<Product> productPage = productsRepository.findAll(pageable);
+		// Tìm sản phẩm theo seller
+		Page<Product> productPage = productsRepository.findBySeller(seller, pageable);
 
 		// Thêm thông tin sản phẩm vào model
 		model.addAttribute("pageProd", productPage.getContent());
@@ -119,212 +142,221 @@ public class Admin_ProductController {
 
 	@PostMapping("/create")
 	public String createProduct(Model model, HttpServletRequest req,
-			@RequestParam("img") MultipartFile photo,
-			@RequestParam("productName") String productName,
-			@RequestParam("price") String priceStr,
-			@RequestParam("discountPercentage") String discountPercentageStr,
-			@RequestParam("publishingYear") String publishingYearStr,
-			@RequestParam("weight") String weight,
-			@RequestParam("size") String size,
-			@RequestParam("numberOfPages") String numberOfPagesStr,
-			@RequestParam("language") String language,
-			@RequestParam("author") String author,
-			@RequestParam("description") String description,
-			@RequestParam("manufacturer") String manufacturer,
-			@RequestParam("postingDate") String postingDateStr,
-			@RequestParam(value = "quantity", required = false, defaultValue = "0") String quantityStr,
-			@RequestParam("categoryId") String categoryIdStr,
-			@RequestParam("statusId") String statusIdStr,
-			RedirectAttributes redirectAttributes) {
+	        @RequestParam("img") MultipartFile photo,
+	        @RequestParam("productName") String productName,
+	        @RequestParam("price") String priceStr,
+	        @RequestParam(value = "discountPercentage", required = false, defaultValue = "0") String discountPercentageStr,
+	        @RequestParam("yearManufacture") String yearManufactureStr,
+	        @RequestParam("size") String size,
+	        @RequestParam("material") String material,
+	        @RequestParam("description") String description,
+	        @RequestParam("placeProduction") String placeProduction,
+	        @RequestParam("postingDate") String postingDateStr,
+	        @RequestParam(value = "quantity", required = false, defaultValue = "0") String quantityStr,
+	        @RequestParam("categoryId") String categoryIdStr,
+	        @RequestParam("statusId") String statusIdStr,
+//	        @RequestParam("sellerId") String sellerIdStr, 
+	        RedirectAttributes redirectAttributes) {
 
-		List<String> errors = new ArrayList<>();
+	    List<String> errors = new ArrayList<>();
 
-		// Validate required fields
-		if (productName == null || productName.trim().isEmpty()) {
-			errors.add("Tên sản phẩm là bắt buộc.");
-		}
-		if (priceStr == null || priceStr.trim().isEmpty()) {
-			errors.add("Giá sản phẩm là bắt buộc.");
-		}
-		if (publishingYearStr == null || publishingYearStr.trim().isEmpty()) {
-			errors.add("Năm xuất bản là bắt buộc.");
-		}
-		if (weight == null || weight.trim().isEmpty()) {
-			errors.add("Trọng lượng là bắt buộc.");
-		}
-		if (size == null || size.trim().isEmpty()) {
-			errors.add("Kích thước là bắt buộc.");
-		}
-		if (numberOfPagesStr == null || numberOfPagesStr.trim().isEmpty()) {
-			errors.add("Số trang là bắt buộc.");
-		}
-		if (language == null || language.trim().isEmpty()) {
-			errors.add("Ngôn ngữ là bắt buộc.");
-		}
-		if (author == null || author.trim().isEmpty()) {
-			errors.add("Tác giả là bắt buộc.");
-		}
-		if (description == null || description.trim().isEmpty()) {
-			errors.add("Mô tả là bắt buộc.");
-		}
-		if (manufacturer == null || manufacturer.trim().isEmpty()) {
-			errors.add("Nhà sản xuất là bắt buộc.");
-		}
-		if (postingDateStr == null || postingDateStr.trim().isEmpty()) {
-			errors.add("Ngày đăng bán là bắt buộc.");
-		}
-		if (categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
-			errors.add("Mã danh mục là bắt buộc.");
-		}
-		if (statusIdStr == null || statusIdStr.trim().isEmpty()) {
-			errors.add("Mã trạng thái là bắt buộc.");
-		}
+	    // Validate required fields
+	    if (productName == null || productName.trim().isEmpty()) {
+	        errors.add("Tên sản phẩm là bắt buộc.");
+	    }
+	    if (priceStr == null || priceStr.trim().isEmpty()) {
+	        errors.add("Giá sản phẩm là bắt buộc.");
+	    }
+	    if (yearManufactureStr == null || yearManufactureStr.trim().isEmpty()) {
+	        errors.add("Năm sản xuất là bắt buộc.");
+	    }
+	    if (size == null || size.trim().isEmpty()) {
+	        errors.add("Kích thước là bắt buộc.");
+	    }
+	    if (material == null || material.trim().isEmpty()) {
+	        errors.add("Vật liệu là bắt buộc.");
+	    }
+	    if (description == null || description.trim().isEmpty()) {
+	        errors.add("Mô tả là bắt buộc.");
+	    }
+	    if (placeProduction == null || placeProduction.trim().isEmpty()) {
+	        errors.add("Nơi sản xuất là bắt buộc.");
+	    }
+	    if (postingDateStr == null || postingDateStr.trim().isEmpty()) {
+	        errors.add("Ngày đăng bán là bắt buộc.");
+	    }
+	    if (categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
+	        errors.add("Mã danh mục là bắt buộc.");
+	    }
+	    if (statusIdStr == null || statusIdStr.trim().isEmpty()) {
+	        errors.add("Mã trạng thái là bắt buộc.");
+	    }
+//	    if (sellerIdStr == null || sellerIdStr.trim().isEmpty()) {
+//	        errors.add("Mã người bán là bắt buộc.");
+//	    }
 
-		// Validate price
-		float price = 0;
-		try {
-			price = Float.parseFloat(priceStr);
-			if (price <= 0) {
-				errors.add("Giá phải lớn hơn 0.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng giá không hợp lệ.");
-		}
+	    // Validate price
+	    float price = 0;
+	    try {
+	        price = Float.parseFloat(priceStr);
+	        if (price <= 0) {
+	            errors.add("Giá phải lớn hơn 0.");
+	        }
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng giá không hợp lệ.");
+	    }
 
-		// Validate discountPercentage
-		float discountPercentage = 0;
-		try {
-			discountPercentage = Float.parseFloat(discountPercentageStr);
-			if (discountPercentage < 0) {
-				errors.add("Phần trăm giảm giá không được âm.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng phần trăm giảm giá không hợp lệ.");
-		}
+	    // Validate discountPercentage
+	    float discountPercentage = 0;
+	    try {
+	        discountPercentage = Float.parseFloat(discountPercentageStr);
+	        if (discountPercentage < 0) {
+	            errors.add("Phần trăm giảm giá không được âm.");
+	        }
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng phần trăm giảm giá không hợp lệ.");
+	    }
 
-		// Validate publishingYear
-		int publishingYear = 0;
-		try {
-			publishingYear = Integer.parseInt(publishingYearStr);
-			if (publishingYear <= 0) {
-				errors.add("Năm xuất bản phải là số nguyên dương.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng năm xuất bản không hợp lệ.");
-		}
+	    // Validate yearManufacture
+	    int yearManufacture = 0;
+	    try {
+	        yearManufacture = Integer.parseInt(yearManufactureStr);
+	        if (yearManufacture <= 0) {
+	            errors.add("Năm sản xuất phải là số nguyên dương.");
+	        }
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng năm sản xuất không hợp lệ.");
+	    }
 
-		// Validate numberOfPages
-		int numberOfPages = 0;
-		try {
-			numberOfPages = Integer.parseInt(numberOfPagesStr);
-			if (numberOfPages <= 0) {
-				errors.add("Số trang phải là số nguyên dương.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng số trang không hợp lệ.");
-		}
+	    // Validate categoryId
+	    int categoryId = 0;
+	    try {
+	        categoryId = Integer.parseInt(categoryIdStr);
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng mã danh mục không hợp lệ.");
+	    }
 
-		// Validate categoryId
-		int categoryId = 0;
-		try {
-			categoryId = Integer.parseInt(categoryIdStr);
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng mã danh mục không hợp lệ.");
-		}
+	    // Validate statusId
+	    int statusId = 0;
+	    try {
+	        statusId = Integer.parseInt(statusIdStr);
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng mã trạng thái không hợp lệ.");
+	    }
 
-		// Validate statusId
-		int statusId = 0;
-		try {
-			statusId = Integer.parseInt(statusIdStr);
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng mã trạng thái không hợp lệ.");
-		}
+	    // Validate sellerId
+//	    int sellerId = 0;
+//	    try {
+//	        sellerId = Integer.parseInt(sellerIdStr);
+//	    } catch (NumberFormatException e) {
+//	        errors.add("Định dạng mã người bán không hợp lệ.");
+//	    }
 
-		// Validate postingDate
-		Date postingDate = null;
-		try {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			postingDate = dateFormat.parse(postingDateStr);
-		} catch (ParseException e) {
-			errors.add("Định dạng ngày đăng bán không hợp lệ.");
-		}
+	    // Validate postingDate
+	    Date postingDate = null;
+	    try {
+	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	        postingDate = dateFormat.parse(postingDateStr);
+	    } catch (ParseException e) {
+	        errors.add("Định dạng ngày đăng bán không hợp lệ.");
+	    }
 
-		// Validate quantity
-		int quantity = 0;
-		try {
-			quantity = Integer.parseInt(quantityStr);
-			if (quantity < 0) {
-				errors.add("Số lượng không được âm.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng số lượng không hợp lệ.");
-		}
+	    // Validate quantity
+	    int quantity = 0;
+	    try {
+	        quantity = Integer.parseInt(quantityStr);
+	        if (quantity < 0) {
+	            errors.add("Số lượng không được âm.");
+	        }
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng số lượng không hợp lệ.");
+	    }
 
-		// Check if product with the same name already exists
-		if (productService.existsByProductName(productName)) {
-			errors.add("Sản phẩm với tên '" + productName + "' đã tồn tại trong hệ thống.");
-		}
+	    // Check if product with the same name already exists
+	    if (productService.existsByProductName(productName)) {
+	        errors.add("Sản phẩm với tên '" + productName + "' đã tồn tại trong hệ thống.");
+	    }
 
-		// Check for errors
-		if (!errors.isEmpty()) {
-			// Return to the creation page with the errors
-			redirectAttributes.addFlashAttribute("errorMessage", String.join(", ", errors));
-			return "redirect:/admin/products/create"; // Redirect back to the product creation page
-		}
+	    // Check for errors
+	    if (!errors.isEmpty()) {
+	        // Return to the creation page with the errors
+	        redirectAttributes.addFlashAttribute("errorMessage", String.join(", ", errors));
+	        return "redirect:/admin/products/create"; // Redirect back to the product creation page
+	    }
 
-		try {
-			// Tìm đối tượng Category và Status theo mã
-			Category category = categoryService.findByCategoryCode(categoryId);
-			ProductStatus status = productStatusService.findByStatusId(statusId);
+	    try {
+	        // Tìm đối tượng Category, Status và Seller theo mã
+	        Category category = categoryService.findByCategoryCode(categoryId);
+	        ProductStatus status = productStatusService.findByStatusId(statusId);
+	        
+	        // Lấy thông tin người dùng từ session
+	        String username = req.getUserPrincipal().getName();
+	        User user = userRepository.findByUsername(username);
 
-			// Tạo đối tượng Product mới
-			Product product = new Product();
-			product.setProductName(productName);
-			product.setPrice(price);
-			product.setPercentDecrease(discountPercentage);
-			product.setYearManufacture(publishingYear);
-			// product.setWeight(weight);
-			product.setSize(size);
-			// product.setNumberOfPages(numberOfPagesStr);
-			// product.setLanguage(language);
-			// product.setAuthor(author);
-			product.setDescription(description);
-			// product.setManufacturer(manufacturer);
-			product.setPostingDate(postingDate);
-			product.setQuantity(quantity);
-			product.setCategory(category);
-			product.setStatus(status);
+	        // Kiểm tra xem user có null hay không
+	        if (user == null) {
+	            return "redirect:/login"; // Hoặc trang lỗi
+	        }
 
-			// Xử lý ảnh
-			if (!photo.isEmpty()) {
-				String fileName = photo.getOriginalFilename();
-				String realPath = req.getServletContext().getRealPath("/Image_SP/" + fileName);
-				Path path = Path.of(realPath);
-				if (!Files.exists(path.getParent())) {
-					Files.createDirectories(path.getParent());
-				}
-				File file = new File(realPath);
-				photo.transferTo(file);
+	        // Lấy danh sách seller từ thông tin người dùng
+	        List<Seller> sellers = user.getSellers(); // Lấy danh sách Seller từ User
 
-				// Tạo đối tượng Image mới và lưu thông tin ảnh vào cơ sở dữ liệu
-				Image image = new Image();
-				image.setImageName(fileName);
-				imageService.saveImage(image);
-				product.setImageId(image);
-			}
+	        // Kiểm tra xem seller có tồn tại không
+	        if (sellers == null || sellers.isEmpty()) {
+	            return "redirect:/error seller"; // Hoặc trang lỗi
+	        }
 
-			// Lưu sản phẩm vào cơ sở dữ liệu
-			productService.saveProduct(product);
-			redirectAttributes.addFlashAttribute("successMessage", "Tạo sản phẩm thành công!");
+	        // Giả sử bạn chỉ muốn làm việc với seller đầu tiên trong danh sách
+	        Seller seller = sellers.get(0); // Lấy seller đầu tiên
 
-		} catch (Exception e) {
-			errors.add("Đã xảy ra lỗi: " + e.getMessage());
-			redirectAttributes.addFlashAttribute("errorMessage", String.join(", ", errors));
-			return "redirect:/admin/products/create"; // Chuyển hướng về trang tạo sản phẩm
-		}
+	        // Tạo đối tượng Product mới
+	        Product product = new Product();
+	        product.setProductName(productName);
+	        product.setPrice(price);
+	        product.setPercentDecrease(discountPercentage);
+	        product.setYearManufacture(yearManufacture);
+	        product.setSize(size);
+	        product.setMaterial(material); // Cập nhật trường vật liệu
+	        product.setDescription(description);
+	        product.setPlaceProduction(placeProduction); // Cập nhật trường nơi sản xuất
+	        product.setPostingDate(postingDate);
+	        product.setQuantity(quantity);
+	        product.setCategory(category);
+	        product.setStatus(status);
+	        product.setSeller(seller); // Thiết lập người bán
 
-		return "redirect:/admin/products/list"; // Chuyển hướng đến danh sách sản phẩm
+	        // Xử lý ảnh
+	        if (!photo.isEmpty()) {
+	            String fileName = photo.getOriginalFilename();
+	            String realPath = req.getServletContext().getRealPath("/Image_SP/" + fileName);
+	            Path path = Path.of(realPath);
+	            if (!Files.exists(path.getParent())) {
+	                Files.createDirectories(path.getParent());
+	            }
+	            File file = new File(realPath);
+	            photo.transferTo(file);
+
+	            // Tạo đối tượng Image mới và lưu thông tin ảnh vào cơ sở dữ liệu
+	            Image image = new Image();
+	            image.setImageName(fileName);
+	            imageService.saveImage(image);
+	            product.setImageId(image);
+	        }
+
+	        // Lưu sản phẩm vào cơ sở dữ liệu
+	        productService.saveProduct(product);
+	        redirectAttributes.addFlashAttribute("successMessage", "Tạo sản phẩm thành công!");
+
+	    } catch (Exception e) {
+	        errors.add("Đã xảy ra lỗi: " + e.getMessage());
+	        redirectAttributes.addFlashAttribute("errorMessage", String.join(", ", errors));
+	        return "redirect:/admin/products/create"; // Chuyển hướng về trang tạo sản phẩm
+	    }
+
+	    return "redirect:/admin/products/list"; // Chuyển hướng đến danh sách sản phẩm
 	}
+
+
 
 	@GetMapping("/edit/{productId}")
 	public String edit(HttpServletRequest req, Model model, @PathVariable(name = "productId") Integer id) {
@@ -356,175 +388,163 @@ public class Admin_ProductController {
 
 	@PostMapping("/update/{productId}")
 	public String updateProduct(Model model, @PathVariable(name = "productId") Integer productId,
-			@RequestParam("productName") String productName, @RequestParam("price") String priceStr,
-			@RequestParam("discountPercentage") String discountPercentageStr,
-			@RequestParam("publishingYear") String publishingYearStr, @RequestParam("weight") String weight,
-			@RequestParam("size") String size, @RequestParam("numberOfPages") String numberOfPagesStr,
-			@RequestParam("language") String language, @RequestParam("author") String author,
-			@RequestParam("description") String description, @RequestParam("manufacturer") String manufacturer,
-			@RequestParam("postingDate") String postingDateStr,
-			@RequestParam(value = "quantity", required = false, defaultValue = "0") String quantityStr,
-			@RequestParam("categoryId") String categoryIdStr, @RequestParam("statusId") String statusIdStr,
-			@RequestPart(value = "img", required = false) MultipartFile photo, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+	        @RequestParam("productName") String productName, @RequestParam("price") String priceStr,
+	        @RequestParam("percentDecrease") String percentDecreaseStr, // Sửa tên tham số cho đúng
+	        @RequestParam("yearManufacture") String yearManufactureStr, // Sửa tên tham số cho đúng
+	        @RequestParam("size") String size, @RequestParam("material") String material,
+	        @RequestParam("description") String description, 
+	        @RequestParam("postingDate") String postingDateStr,
+	        @RequestParam(value = "quantity", required = false, defaultValue = "0") String quantityStr,
+	        @RequestParam("categoryId") String categoryIdStr, @RequestParam("statusId") String statusIdStr,
+	        @RequestPart(value = "img", required = false) MultipartFile photo, HttpServletRequest request,
+	        RedirectAttributes redirectAttributes) {
 
-		List<String> errors = new ArrayList<>();
+	    List<String> errors = new ArrayList<>();
 
-		// Validate productName
-		if (productName == null || productName.trim().isEmpty()) {
-			errors.add("Tên sản phẩm là bắt buộc.");
-		}
+	    // Validate productName
+	    if (productName == null || productName.trim().isEmpty()) {
+	        errors.add("Tên sản phẩm là bắt buộc.");
+	    }
 
-		// Validate price
-		float price = 0;
-		try {
-			price = Float.parseFloat(priceStr);
-			if (price <= 0) {
-				errors.add("Giá phải lớn hơn 0.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng giá không hợp lệ.");
-		}
-		float discountPercentage = 0;
-		try {
-			discountPercentage = Float.parseFloat(discountPercentageStr);
-			if (discountPercentage == 0) {
-				errors.add("Sản phẩm không được giảm giá.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng giá không hợp lệ.");
-		}
-		// Validate publishingYear
-		int publishingYear = 0;
-		try {
-			publishingYear = Integer.parseInt(publishingYearStr);
-			if (publishingYear <= 0) {
-				errors.add("Năm xuất bản phải là số nguyên dương.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng năm xuất bản không hợp lệ.");
-		}
+	    // Validate price
+	    float price = 0;
+	    try {
+	        price = Float.parseFloat(priceStr);
+	        if (price <= 0) {
+	            errors.add("Giá phải lớn hơn 0.");
+	        }
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng giá không hợp lệ.");
+	    }
 
-		// Validate numberOfPages
-		int numberOfPages = 0;
-		try {
-			numberOfPages = Integer.parseInt(numberOfPagesStr);
-			if (numberOfPages <= 0) {
-				errors.add("Số trang phải là số nguyên dương.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng số trang không hợp lệ.");
-		}
+	    // Validate percentDecrease
+	    float percentDecrease = 0;
+	    try {
+	        percentDecrease = Float.parseFloat(percentDecreaseStr);
+	        if (percentDecrease < 0) {
+	            errors.add("Phần trăm giảm giá không được âm.");
+	        }
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng phần trăm giảm giá không hợp lệ.");
+	    }
 
-		// Validate categoryId
-		int categoryId = 0;
-		try {
-			categoryId = Integer.parseInt(categoryIdStr);
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng mã danh mục không hợp lệ.");
-		}
+	    // Validate yearManufacture
+	    int yearManufacture = 0;
+	    try {
+	        yearManufacture = Integer.parseInt(yearManufactureStr);
+	        if (yearManufacture <= 0) {
+	            errors.add("Năm sản xuất phải là số nguyên dương.");
+	        }
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng năm sản xuất không hợp lệ.");
+	    }
 
-		// Validate statusId
-		int statusId = 0;
-		try {
-			statusId = Integer.parseInt(statusIdStr);
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng mã trạng thái không hợp lệ.");
-		}
+	    // Validate quantity
+	    int quantity = 0;
+	    try {
+	        quantity = Integer.parseInt(quantityStr);
+	        if (quantity < 0) {
+	            errors.add("Số lượng không được âm.");
+	        }
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng số lượng không hợp lệ.");
+	    }
 
-		// Validate postingDate
-		Date postingDate = null;
-		try {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			postingDate = dateFormat.parse(postingDateStr);
-		} catch (ParseException e) {
-			errors.add("Định dạng ngày đăng bán không hợp lệ.");
-		}
+	    // Validate categoryId
+	    int categoryId = 0;
+	    try {
+	        categoryId = Integer.parseInt(categoryIdStr);
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng mã danh mục không hợp lệ.");
+	    }
 
-		// Validate quantity
-		int quantity = 0;
-		try {
-			quantity = Integer.parseInt(quantityStr);
-			if (quantity < 0) {
-				errors.add("Số lượng không được âm.");
-			}
-		} catch (NumberFormatException e) {
-			errors.add("Định dạng số lượng không hợp lệ.");
-		}
+	    // Validate statusId
+	    int statusId = 0;
+	    try {
+	        statusId = Integer.parseInt(statusIdStr);
+	    } catch (NumberFormatException e) {
+	        errors.add("Định dạng mã trạng thái không hợp lệ.");
+	    }
 
-		// Check for errors
-		if (!errors.isEmpty()) {
-			redirectAttributes.addFlashAttribute("errorMessage", String.join(", ", errors));
-			return "redirect:/admin/products/update/" + productId; // Chuyển hướng về trang cập nhật sản phẩm
-		}
+	    // Validate postingDate
+	    Date postingDate = null;
+	    try {
+	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	        postingDate = dateFormat.parse(postingDateStr);
+	    } catch (ParseException e) {
+	        errors.add("Định dạng ngày đăng bán không hợp lệ.");
+	    }
 
-		try {
-			// Find Product by productId
-			Product product = productService.findByProductId(productId);
-			if (product == null) {
-				redirectAttributes.addFlashAttribute("errorMessage", "Sản phẩm không tồn tại.");
-				return "redirect:/admin/products/list";
-			}
+	    // Check for errors
+	    if (!errors.isEmpty()) {
+	        redirectAttributes.addFlashAttribute("errorMessages", errors); // Sử dụng để hiển thị thông báo lỗi
+	        return "redirect:/admin/products/update/" + productId; // Chuyển hướng về trang cập nhật sản phẩm
+	    }
 
-			// Find Category and Status by their IDs
-			Category category = categoryService.findByCategoryCode(categoryId);
-			ProductStatus status = productStatusService.findByStatusId(statusId);
+	    try {
+	        // Find Product by productId
+	        Product product = productService.findByProductId(productId);
+	        if (product == null) {
+	            redirectAttributes.addFlashAttribute("errorMessage", "Sản phẩm không tồn tại.");
+	            return "redirect:/admin/products/list";
+	        }
 
-			// Update product attributes
-			product.setProductName(productName);
-			product.setPrice(price);
-			// product.setDiscountPercentage(discountPercentage);
-			// product.setPublishingYear(publishingYear);
-			// product.setWeight(weight);
-			product.setSize(size);
-			// product.setNumberOfPages(numberOfPagesStr);
-			// product.setLanguage(language);
-			// product.setAuthor(author);
-			product.setDescription(description);
-			// product.setManufacturer(manufacturer);
-			product.setPostingDate(postingDate);
-			product.setQuantity(quantity);
-			product.setCategory(category);
-			product.setStatus(status); // Set the status for the product
+	        // Find Category and Status by their IDs
+	        Category category = categoryService.findByCategoryCode(categoryId);
+	        ProductStatus status = productStatusService.findByStatusId(statusId);
 
-			// Handle image upload if provided
-			if (photo != null && !photo.isEmpty()) {
-				String fileName = StringUtils.cleanPath(photo.getOriginalFilename());
-				String uploadDir = "/Image_SP/";
-				String realPath = request.getServletContext().getRealPath(uploadDir);
-				Path path = Paths.get(realPath);
-				if (Files.notExists(path)) {
-					Files.createDirectories(path);
-				}
+	        // Update product attributes
+	        product.setProductName(productName);
+	        product.setPrice(price);
+	        product.setPercentDecrease(percentDecrease); // Cập nhật phần trăm giảm giá
+	        product.setYearManufacture(yearManufacture); // Cập nhật năm sản xuất
+	        product.setSize(size);
+	        product.setMaterial(material); // Cập nhật chất liệu
+	        product.setDescription(description);
+	        product.setPostingDate(postingDate);
+	        product.setQuantity(quantity);
+	        product.setCategory(category);
+	        product.setStatus(status); // Set the status for the product
 
-				// Save image file
-				Path filePath = Paths.get(realPath, fileName);
-				Files.copy(photo.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+	        // Handle image upload if provided
+	        if (photo != null && !photo.isEmpty()) {
+	            String fileName = StringUtils.cleanPath(photo.getOriginalFilename());
+	            String uploadDir = "/Image_SP/";
+	            String realPath = request.getServletContext().getRealPath(uploadDir);
+	            Path path = Paths.get(realPath);
+	            if (Files.notExists(path)) {
+	                Files.createDirectories(path);
+	            }
 
-				// Create new Image object and save image details to database
-				Image image = new Image();
-				image.setImageName(fileName);
-				imageService.saveImage(image);
+	            // Save image file
+	            Path filePath = Paths.get(realPath, fileName);
+	            Files.copy(photo.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-				// Link Image object to Product before saving Product
-				product.setImageId(image);
-			}
+	            // Create new Image object and save image details to database
+	            Image image = new Image();
+	            image.setImageName(fileName);
+	            imageService.saveImage(image);
 
-			// Save updated product to database
-			productService.saveProduct(product);
+	            // Link Image object to Product before saving Product
+	            product.setImageId(image);
+	        }
 
-			// Add success message
-			redirectAttributes.addFlashAttribute("successMessage", "Cập nhật sản phẩm thành công!");
+	        // Save updated product to database
+	        productService.saveProduct(product);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi: " + e.getMessage());
-			return "redirect:/admin/products/update/" + productId; // Chuyển hướng về trang cập nhật sản phẩm
-		}
+	        // Add success message
+	        redirectAttributes.addFlashAttribute("successMessage", "Cập nhật sản phẩm thành công!");
 
-		// Redirect to the list of products
-		return "redirect:/admin/products/list";
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi: " + e.getMessage());
+	        return "redirect:/admin/products/update/" + productId; // Chuyển hướng về trang cập nhật sản phẩm
+	    }
+
+	    // Redirect to the list of products
+	    return "redirect:/admin/products/list";
 	}
+
 
 	@GetMapping("/delete/{productId}")
 	public String delete(@PathVariable(name = "productId") Integer id, Model model,

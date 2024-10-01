@@ -46,9 +46,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/home/**","/home/login", "/home/logout","/home/login?error=true").permitAll()
+                .requestMatchers("/home/**" ,"/home/login", "/home/logout","/home/login?error=true").permitAll()
                 .requestMatchers("/home/**", "/home/products/details/cart/**", "/products/details/cart/paynow/**", "/products/details/cart/pay", "/products/details/cart/pay/success").hasAnyRole("ADMIN", "USER")
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasAnyRole("SELER","ADMIN")
                 .requestMatchers("/home/index").permitAll()
                 .requestMatchers("/css/**", "/assets/**", "/Image_Users/**", "/images/**", "/vendor/**", "/Image_SP/**").permitAll()
             )

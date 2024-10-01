@@ -83,18 +83,18 @@
                         </div>
                         <br>
                         <div class="form-group">
-                            <label for="discountPercentage">Phần trăm giảm giá:</label>
-                            <input type="number" class="form-control" id="discountPercentage" name="discountPercentage"
-                                   th:value="${itemProd.discountPercentage}" required>
+                            <label for="percentDecrease">Phần trăm giảm giá:</label>
+                            <input type="number" class="form-control" id="percentDecrease" name="percentDecrease"
+                                   th:value="${itemProd.percentDecrease}" required>
                             <div class="invalid-feedback">Phần trăm giảm giá là bắt buộc.</div>
                         </div>
                         <br>
-                        <div class="form-group">
+<!--                         <div class="form-group">
                             <label for="manufacturer">Nhà sản xuất:</label>
                             <input type="text" class="form-control" id="manufacturer" name="manufacturer"
                                    th:value="${itemProd.manufacturer}" required>
                             <div class="invalid-feedback">Nhà sản xuất là bắt buộc.</div>
-                        </div>
+                        </div> -->
                         <br>
                         <div class="form-group">
                             <label for="postingDate">Ngày đăng bán:</label>
@@ -103,7 +103,7 @@
                             <div class="invalid-feedback">Ngày đăng bán là bắt buộc.</div>
                         </div>
                         <br>
-                        <div class="form-group">
+                           <div class="form-group">
                             <label>Hình ảnh:</label>
                             <input type="file" class="form-control" name="img" />
                             <br>
@@ -114,17 +114,17 @@
                         </div>
                         <br>
                         <div class="form-group">
-                            <label for="publishingYear">Năm xuất bản:</label>
-                            <input type="number" class="form-control" id="publishingYear" name="publishingYear"
-                                   th:value="${itemProd.publishingYear}" required>
-                            <div class="invalid-feedback">Năm xuất bản là bắt buộc.</div>
+                            <label for="yearManufacture">Năm sản xuất:</label>
+                            <input type="number" class="form-control" id="yearManufacture" name="yearManufacture"
+                                   th:value="${itemProd.yearManufacture}" required>
+                            <div class="invalid-feedback">Năm sản xuất là bắt buộc.</div>
                         </div>
                         <br>
                         <div class="form-group">
-                            <label for="weight">Khối lượng:</label>
-                            <input type="text" class="form-control" id="weight" name="weight"
-                                   th:value="${itemProd.weight}" required>
-                            <div class="invalid-feedback">Khối lượng là bắt buộc.</div>
+                            <label for="quantity">Số lượng:</label>
+                            <input type="number" name="quantity" id="quantity" th:value="${itemProd.quantity}"
+                                   class="form-control" placeholder="Số lượng" required>
+                            <div class="invalid-feedback">Số lượng là bắt buộc.</div>
                         </div>
                         <br>
                     </div>
@@ -138,24 +138,10 @@
                         </div>
                         <br>
                         <div class="form-group">
-                            <label for="numberOfPages">Số trang:</label>
-                            <input type="text" class="form-control" id="numberOfPages" name="numberOfPages"
-                                   th:value="${itemProd.numberOfPages}" required>
-                            <div class="invalid-feedback">Số trang là bắt buộc.</div>
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            <label for="language">Ngôn ngữ:</label>
-                            <input type="text" class="form-control" id="language" name="language"
-                                   th:value="${itemProd.language}" required>
-                            <div class="invalid-feedback">Ngôn ngữ là bắt buộc.</div>
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            <label for="author">Tác giả:</label>
-                            <input type="text" class="form-control" id="author" name="author"
-                                   th:value="${itemProd.author}" required>
-                            <div class="invalid-feedback">Tác giả là bắt buộc.</div>
+                            <label for="material">Chất liệu:</label>
+                            <input type="text" class="form-control" id="material" name="material"
+                                   th:value="${itemProd.material}" required>
+                            <div class="invalid-feedback">Chất liệu là bắt buộc.</div>
                         </div>
                         <br>
                         <div class="form-group">
@@ -166,10 +152,10 @@
                         </div>
                         <br>
                         <div class="form-group">
-                            <label for="quantity">Số lượng:</label>
-                            <input type="number" name="quantity" id="quantity" th:value="${itemProd.quantity}"
-                                   class="form-control" placeholder="Số lượng" required>
-                            <div class="invalid-feedback">Số lượng là bắt buộc.</div>
+                            <label for="placeProduction">Địa điểm sản xuất:</label>
+                            <input type="text" class="form-control" id="placeProduction" name="placeProduction"
+                                   th:value="${itemProd.placeProduction}" required>
+                            <div class="invalid-feedback">Địa điểm sản xuất là bắt buộc.</div>
                         </div>
                         <br>
                         <div class="form-group">
@@ -190,7 +176,6 @@
                                 <option value="" disabled th:if="${status == null}">Chọn trạng thái</option>
                                 <option th:each="status : ${productStatus}"
                                         th:value="${status.statusId}"
-                                        th:selected="${itemProd?.status?.statusId == status.statusId}"
                                         th:text="${status.statusName}"></option>
                             </select>
                             <div class="invalid-feedback">Vui lòng chọn trạng thái!</div>
@@ -199,8 +184,8 @@
                 </div>
             </div>
             <div class="card-footer text-muted">
-                <button class="btn btn-outline-success" type="submit">Create</button>
-                <button class="btn btn-outline-warning" formaction="/admin/products/reset">Reset</button>
+                <button class="btn btn-outline-success" type="submit">Tạo</button>
+                <button class="btn btn-outline-warning" formaction="/admin/products/reset">Đặt lại</button>
             </div>
         </div>
     </form>
@@ -226,28 +211,29 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-        var toastList = toastElList.map(function (toastEl) {
-            return new bootstrap.Toast(toastEl, {delay: 5000});
-        });
-        toastList.forEach(function (toast) {
-            toast.show();
-        });
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
+        integrity="sha384-oBqDVmMz4fnFO9gybT50aNwzY62Om6c2G96RzKcYIo7/cpR2T+b8Zx1w2pbx4X0i"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-JUu6u+86j4abGmHi0Hr1eTHCvU5yG6Xeyf0m80w/RzYHgTSb+b6VZlC1/bBq+uYx"
+        crossorigin="anonymous"></script>
 
-        // Custom validation for form
-        var forms = document.querySelectorAll('.needs-validation');
+<!-- Validate form -->
+<script>
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
         Array.prototype.slice.call(forms).forEach(function (form) {
             form.addEventListener('submit', function (event) {
                 if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
+                    event.preventDefault()
+                    event.stopPropagation()
                 }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    });
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
 </script>
 </body>
 </html>

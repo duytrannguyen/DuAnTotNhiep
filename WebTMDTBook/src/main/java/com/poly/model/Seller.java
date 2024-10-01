@@ -36,8 +36,8 @@ public class Seller {
     @Column(name = "avt_shop")
     private String avtShop;
 
-    @Column(name = "background")
-    private String background;
+//    @Column(name = "background")
+//    private String background;
 
     @Column(name = "type_business")
     private String typeBusiness;
@@ -59,5 +59,6 @@ public class Seller {
     private User user;
 
     @OneToMany(mappedBy = "seller")
-    private List<Product> products;
+    private List<Product> products; // Đảm bảo rằng mappedBy đúng
+
 }

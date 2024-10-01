@@ -27,15 +27,8 @@
                                             <th>Tên sản phẩm</th>
                                             <th>Giá Bán</th>
                                             <th>Phần trăm giảm giá</th>
-                                            <th>Năm xuất bản</th>
-                                            <th>Khối lượng</th>
-                                            <th>Kích thước</th>
-                                            <th>Số trang</th>
-                                            <th>Ngôn ngữ</th>
-                                            <th>Tác giả</th>
-                                            <th>Nhà sản xuất</th>
-                                            <th>Ngày đăng bán</th>
-                                            <th>Số lượng</th>
+                                            <th>Năm sản xuất</th>
+                                            <th>Vật liệu</th>
                                             <th>Mô tả</th>
                                             <th>Loại SP</th>
                                             <th>Hình ảnh</th>
@@ -49,16 +42,9 @@
                                             <td th:text="${loop.index + 1}">1</td>
                                             <td th:text="${item.productName}">Sample Product</td>
                                             <td class="price" th:text="${item.price}">100,000</td>
-                                            <td th:text="${item.discountPercentage}">10%</td>
-                                            <td th:text="${item.publishingYear}">2021</td>
-                                            <td th:text="${item.weight}">500g</td>
-                                            <td th:text="${item.size}">10x20cm</td>
-                                            <td th:text="${item.numberOfPages}">300</td>
-                                            <td th:text="${item.language}">Vietnamese</td>
-                                            <td th:text="${item.author}">Author Name</td>
-                                            <td th:text="${item.manufacturer}">Manufacturer Name</td>
-                                            <td th:text="${#dates.format(item.postingDate, 'dd-MM-yyyy')}">01-01-2021</td>
-                                            <td th:text="${item.quantity}">10</td>
+                                            <td th:text="${item.percentDecrease}">10%</td>
+                                            <td th:text="${item.yearManufacture}">2021</td>
+                                            <td th:text="${item.material}">Material</td>
                                             <td th:text="${item.description}">Product Description</td>
                                             <td th:text="${item.category.categoryName}">Category Name</td>
                                             <td><img th:src="@{/Image_SP/{imageName}(imageName=${item.imageId.imageName})}" width="100px" height="100px"></td>

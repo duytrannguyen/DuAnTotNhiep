@@ -30,16 +30,19 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 	        httpSession.setAttribute("user", user); // Lưu đối tượng user vào session
 	    }
 
-	    // Chuyển hướng dựa trên quyền
+//	    // Chuyển hướng dựa trên quyền
 	    String redirectUrl = "/";
 	    if (authentication.getAuthorities().stream()
 	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
-	        redirectUrl = "/admin/baocaothongke/report"; // Chuyển đến trang admin
+	        redirectUrl = "/admin/"; // Chuyển đến trang admin
+	    } else if (authentication.getAuthorities().stream()
+	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SELER"))) {
+	        redirectUrl = "/admin/products/list"; // Chuyển đến trang seller
 	    } else if (authentication.getAuthorities().stream()
 	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_USER"))) {
 	        redirectUrl = "/home/index"; // Chuyển đến trang user
 	    }
-	    
+//	    
 	    response.sendRedirect(redirectUrl);
 	}
 }
