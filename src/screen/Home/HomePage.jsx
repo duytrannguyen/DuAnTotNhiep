@@ -59,6 +59,8 @@ const HomePage = () => {
           getGoogleUserInfo(res)
             .then((res) => {
               localStorage.setItem(TOKEN, res.token);
+              navigate("/")
+              window.location.reload()
               console.log(res);
             })
             .catch((err) => {
